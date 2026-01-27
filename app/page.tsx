@@ -1,65 +1,221 @@
-import Image from "next/image";
+'use client';
+
+import { useState, useEffect } from 'react';
+import {
+    Task,
+    getTasks,
+    createTask,
+    updateTaskCompletion,
+    deleteTask,
+} from '@/actions/tasks';
 
 export default function Home() {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    const [taskInput, setTaskInput] = useState('');
+    const [tasks, setTasks] = useState<Task[]>([]);
+    const [deletedTasks, setDeletedTasks] = useState<string[]>([]);
+    const [showShameLog, setShowShameLog] = useState(false);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        loadTasks();
+    }, []);
+
+    const loadTasks = async () => {
+        try {
+            const { data, error } = await getTasks();
+            if (error) throw new Error(error);
+            setTasks(data || []);
+        } catch (error) {
+            console.error('Error loading tasks:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleKeyDown = async (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter' && taskInput.trim()) {
+            try {
+                const { data, error } = await createTask(taskInput);
+                if (error) throw new Error(error);
+                if (data) {
+                    setTasks([data, ...tasks]);
+                    setTaskInput('');
+                }
+            } catch (error) {
+                console.error('Error adding task:', error);
+            }
+        }
+    };
+
+    const toggleComplete = async (id: number) => {
+        const task = tasks.find(t => t.id === id);
+        if (!task) return;
+
+        try {
+            const { error } = await updateTaskCompletion(id, !task.completed);
+            if (error) throw new Error(error);
+
+            setTasks(tasks.map(t =>
+                t.id === id ? { ...t, completed: !t.completed } : t
+            ));
+        } catch (error) {
+            console.error('Error updating task:', error);
+        }
+    };
+
+    const handleDeleteTask = async (id: number) => {
+        const taskToDelete = tasks.find(t => t.id === id);
+        if (!taskToDelete) return;
+
+        if (window.confirm(`Really give up on: "${taskToDelete.title}"?`)) {
+            try {
+                const { error } = await deleteTask(id);
+                if (error) throw new Error(error);
+
+                setDeletedTasks([...deletedTasks, taskToDelete.title]);
+                setTasks(tasks.filter(task => task.id !== id));
+            } catch (error) {
+                console.error('Error deleting task:', error);
+            }
+        }
+    };
+
+    const activeTasks = tasks.filter(t => !t.completed);
+    const completedTasks = tasks.filter(t => t.completed);
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-black text-white flex items-center justify-center">
+                <p className="text-xl">Loading tasks...</p>
+            </div>
+        );
+    }
+
+    return (
+        <div className="min-h-screen bg-black text-white p-4">
+            <div className="max-w-2xl mx-auto py-8">
+                <h1 className="text-6xl font-bold mb-4 text-center">JeanToDoList</h1>
+                <p className="text-xl text-gray-400 mb-8 text-center">
+                    The app that makes sure it gets done.
+                </p>
+
+                {/* Stats */}
+                <div className="flex justify-center gap-6 mb-8 text-sm">
+                    <div className="text-center">
+                        <div className="text-2xl font-bold text-blue-500">{activeTasks.length}</div>
+                        <div className="text-gray-500">Active</div>
+                    </div>
+                    <div className="text-center">
+                        <div className="text-2xl font-bold text-green-500">{completedTasks.length}</div>
+                        <div className="text-gray-500">Completed</div>
+                    </div>
+                    {deletedTasks.length > 0 && (
+                        <div className="text-center">
+                            <div className="text-2xl font-bold text-red-500">{deletedTasks.length}</div>
+                            <div className="text-gray-500">Deleted</div>
+                        </div>
+                    )}
+                </div>
+
+                <input
+                    type="text"
+                    value={taskInput}
+                    onChange={(e) => setTaskInput(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    placeholder="What needs to get done?"
+                    className="w-full bg-gray-900 text-white text-lg px-6 py-4 rounded-lg border-2 border-gray-700 focus:border-blue-500 focus:outline-none mb-8"
+                />
+
+                {/* Celebration Message */}
+                {tasks.length > 0 && activeTasks.length === 0 && (
+                    <div className="mb-8 p-6 bg-green-900/20 border-2 border-green-600 rounded-lg text-center">
+                        <p className="text-2xl font-bold text-green-400">🎉 All tasks complete!</p>
+                        <p className="text-green-300 mt-2">You crushed it today.</p>
+                    </div>
+                )}
+
+                {/* Active Tasks */}
+                {activeTasks.length > 0 && (
+                    <div className="mb-8">
+                        <h2 className="text-xl font-bold mb-4 text-gray-300">Active Tasks</h2>
+                        <div className="space-y-3">
+                            {activeTasks.map((task) => (
+                                <div
+                                    key={task.id}
+                                    className="bg-gray-900 px-6 py-4 rounded-lg border-2 border-gray-700 flex items-center justify-between"
+                                >
+                                    <p className="text-lg flex-1">{task.title}</p>
+                                    <div className="flex gap-2">
+                                        <button
+                                            onClick={() => toggleComplete(task.id)}
+                                            className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700"
+                                        >
+                                            Complete
+                                        </button>
+                                        <button
+                                            onClick={() => handleDeleteTask(task.id)}
+                                            className="px-4 py-2 rounded bg-red-900 hover:bg-red-800 text-sm"
+                                        >
+                                            Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* Completed Tasks */}
+                {completedTasks.length > 0 && (
+                    <div className="mb-8">
+                        <h2 className="text-xl font-bold mb-4 text-gray-300">Completed Tasks</h2>
+                        <div className="space-y-3">
+                            {completedTasks.map((task) => (
+                                <div
+                                    key={task.id}
+                                    className="bg-gray-900 px-6 py-4 rounded-lg border-2 border-green-900 flex items-center justify-between opacity-60"
+                                >
+                                    <p className="text-lg flex-1 line-through text-gray-500">{task.title}</p>
+                                    <div className="flex gap-2">
+                                        <button
+                                            onClick={() => toggleComplete(task.id)}
+                                            className="px-4 py-2 rounded bg-green-600 hover:bg-green-700"
+                                        >
+                                            ✓ Done
+                                        </button>
+                                        <button
+                                            onClick={() => handleDeleteTask(task.id)}
+                                            className="px-4 py-2 rounded bg-red-900 hover:bg-red-800 text-sm"
+                                        >
+                                            Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* Shame Log Toggle */}
+                {deletedTasks.length > 0 && (
+                    <div className="mt-6">
+                        <button
+                            onClick={() => setShowShameLog(!showShameLog)}
+                            className="text-gray-500 text-sm hover:text-gray-400"
+                        >
+                            {showShameLog ? 'Hide' : 'Show'} Shame Log ({deletedTasks.length})
+                        </button>
+                        {showShameLog && (
+                            <div className="mt-3 p-4 bg-red-900/20 border-2 border-red-900 rounded-lg">
+                                <p className="text-red-400 font-bold mb-2">Tasks you gave up on:</p>
+                                {deletedTasks.map((task, index) => (
+                                    <p key={index} className="text-red-300 text-sm">• {task}</p>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                )}
+            </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
-  );
+    );
 }
