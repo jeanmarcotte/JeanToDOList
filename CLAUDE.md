@@ -30,3 +30,17 @@ import { Task, getTasks } from '@/actions/tasks';
 - `actions/` - Server actions with "use server" directive, contains types and database operations
 - `app/` - Next.js app router pages and layouts (client components for UI)
 - `lib/` - Shared utilities (avoid putting database clients here if they're only used server-side)
+## Celebration Feature (Added Jan 28, 2026)
+
+### How it works
+- Every 50 completed tasks triggers a celebration popup
+- Tracks ALL-TIME completed tasks (count from database)
+- Auto-dismisses after 5 seconds or click to close
+
+### Files involved
+- `app/components/Celebration.tsx` - The popup component
+- `app/page.tsx` - State management (showCelebration, milestone)
+- `actions/tasks.ts` - `getCompletedCount()` function
+
+### To test
+Change `count % 50` to `count % 1` in page.tsx line ~66
