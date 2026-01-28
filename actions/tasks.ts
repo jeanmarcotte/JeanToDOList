@@ -78,3 +78,19 @@ export async function deleteTask(id: number): Promise<{ error: string | null }> 
 
   return { error: null };
 }
+
+// Get total count of ALL completed tasks (including deleted ones for all-time tracking)
+export async function getCompletedCount(): Promise<{ count: number; error: string | null }> {
+  const supabase = getSupabaseAdmin();
+
+  const { count, error } = await supabase
+      .from("tasks")
+      .select("*", { count: "exact", head: true })
+      .eq("completed", true);
+
+  if (error) {
+    return { count: 0, error: error.message };
+  }
+
+  return { count: count || 0, error: null };
+}

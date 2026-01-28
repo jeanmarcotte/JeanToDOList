@@ -7,7 +7,9 @@ import {
     createTask,
     updateTaskCompletion,
     deleteTask,
+    getCompletedCount,
 } from '@/actions/tasks';
+import Celebration from "./components/Celebration";
 
 export default function Home() {
     const [taskInput, setTaskInput] = useState('');
@@ -15,6 +17,8 @@ export default function Home() {
     const [deletedTasks, setDeletedTasks] = useState<string[]>([]);
     const [showShameLog, setShowShameLog] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [showCelebration, setShowCelebration] = useState(false);
+    const [milestone, setMilestone] = useState(0);
 
     useEffect(() => {
         loadTasks();
@@ -58,6 +62,17 @@ export default function Home() {
             setTasks(tasks.map(t =>
                 t.id === id ? { ...t, completed: !t.completed } : t
             ));
+
+            // Check for milestone celebration (only when completing a task)
+            if (!task.completed) {
+                const { count } = await getCompletedCount();
+                if (count > 0 && count % 50 === 0) {
+                    setMilestone(count);
+                    setShowCelebration(true);
+                    setTimeout(() => setShowCelebration(false), 5000);
+                }
+            }
+
         } catch (error) {
             console.error('Error updating task:', error);
         }
@@ -216,6 +231,12 @@ export default function Home() {
                     </div>
                 )}
             </div>
+            {showCelebration && (
+                <Celebration
+                    milestone={milestone}
+                    onClose={() => setShowCelebration(false)}
+                />
+            )}
         </div>
-    );
+);
 }
