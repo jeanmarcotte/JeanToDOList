@@ -11,8 +11,9 @@ import {
 } from '@/actions/tasks';
 import Celebration from "./components/Celebration";
 import StakesTab from "./components/StakesTab";
+import HabitsTab from "./components/HabitsTab";
 
-type Tab = 'tasks' | 'stakes';
+type Tab = 'tasks' | 'stakes' | 'habits';
 
 export default function Home() {
     const [activeTab, setActiveTab] = useState<Tab>('tasks');
@@ -119,7 +120,7 @@ export default function Home() {
                 </p>
 
                 {/* Tab Bar */}
-                <div className="flex justify-center gap-1 mb-8 bg-gray-900 rounded-lg p-1 max-w-xs mx-auto">
+                <div className="flex justify-center gap-1 mb-8 bg-gray-900 rounded-lg p-1 max-w-sm mx-auto">
                     <button
                         onClick={() => setActiveTab('tasks')}
                         className={`flex-1 px-4 py-2 rounded-md text-sm font-bold transition-colors ${
@@ -140,9 +141,20 @@ export default function Home() {
                     >
                         Stakes
                     </button>
+                    <button
+                        onClick={() => setActiveTab('habits')}
+                        className={`flex-1 px-4 py-2 rounded-md text-sm font-bold transition-colors ${
+                            activeTab === 'habits'
+                                ? 'bg-green-600 text-white'
+                                : 'text-gray-400 hover:text-white'
+                        }`}
+                    >
+                        Habits
+                    </button>
                 </div>
 
                 {activeTab === 'stakes' && <StakesTab />}
+                {activeTab === 'habits' && <HabitsTab />}
 
                 {activeTab === 'tasks' && <>
                 {/* Stats */}
