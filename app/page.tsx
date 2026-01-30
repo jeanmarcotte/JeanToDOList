@@ -10,8 +10,12 @@ import {
     getCompletedCount,
 } from '@/actions/tasks';
 import Celebration from "./components/Celebration";
+import StakesTab from "./components/StakesTab";
+
+type Tab = 'tasks' | 'stakes';
 
 export default function Home() {
+    const [activeTab, setActiveTab] = useState<Tab>('tasks');
     const [taskInput, setTaskInput] = useState('');
     const [tasks, setTasks] = useState<Task[]>([]);
     const [deletedTasks, setDeletedTasks] = useState<string[]>([]);
@@ -110,10 +114,37 @@ export default function Home() {
         <div className="min-h-screen bg-black text-white p-4">
             <div className="max-w-2xl mx-auto py-8">
                 <h1 className="text-6xl font-bold mb-4 text-center">JeanToDoList</h1>
-                <p className="text-xl text-gray-400 mb-8 text-center">
+                <p className="text-xl text-gray-400 mb-6 text-center">
                     The app that makes sure it gets done.
                 </p>
 
+                {/* Tab Bar */}
+                <div className="flex justify-center gap-1 mb-8 bg-gray-900 rounded-lg p-1 max-w-xs mx-auto">
+                    <button
+                        onClick={() => setActiveTab('tasks')}
+                        className={`flex-1 px-4 py-2 rounded-md text-sm font-bold transition-colors ${
+                            activeTab === 'tasks'
+                                ? 'bg-blue-600 text-white'
+                                : 'text-gray-400 hover:text-white'
+                        }`}
+                    >
+                        Tasks
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('stakes')}
+                        className={`flex-1 px-4 py-2 rounded-md text-sm font-bold transition-colors ${
+                            activeTab === 'stakes'
+                                ? 'bg-purple-600 text-white'
+                                : 'text-gray-400 hover:text-white'
+                        }`}
+                    >
+                        Stakes
+                    </button>
+                </div>
+
+                {activeTab === 'stakes' && <StakesTab />}
+
+                {activeTab === 'tasks' && <>
                 {/* Stats */}
                 <div className="flex justify-center gap-6 mb-8 text-sm">
                     <div className="text-center">
@@ -230,6 +261,7 @@ export default function Home() {
                         )}
                     </div>
                 )}
+                </>}
             </div>
             {showCelebration && (
                 <Celebration
