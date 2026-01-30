@@ -21,6 +21,7 @@ export default function Home() {
     const [tasks, setTasks] = useState<Task[]>([]);
     const [deletedTasks, setDeletedTasks] = useState<string[]>([]);
     const [showShameLog, setShowShameLog] = useState(false);
+    const [showCompleted, setShowCompleted] = useState(false);
     const [loading, setLoading] = useState(true);
     const [showCelebration, setShowCelebration] = useState(false);
     const [milestone, setMilestone] = useState(0);
@@ -41,19 +42,22 @@ export default function Home() {
         }
     };
 
-    const handleKeyDown = async (e: React.KeyboardEvent) => {
-        if (e.key === 'Enter' && taskInput.trim()) {
-            try {
-                const { data, error } = await createTask(taskInput);
-                if (error) throw new Error(error);
-                if (data) {
-                    setTasks([data, ...tasks]);
-                    setTaskInput('');
-                }
-            } catch (error) {
-                console.error('Error adding task:', error);
+    const handleAddTask = async () => {
+        if (!taskInput.trim()) return;
+        try {
+            const { data, error } = await createTask(taskInput);
+            if (error) throw new Error(error);
+            if (data) {
+                setTasks([data, ...tasks]);
+                setTaskInput('');
             }
+        } catch (error) {
+            console.error('Error adding task:', error);
         }
+    };
+
+    const handleKeyDown = async (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter') handleAddTask();
     };
 
     const toggleComplete = async (id: number) => {
@@ -175,14 +179,22 @@ export default function Home() {
                     )}
                 </div>
 
-                <input
-                    type="text"
-                    value={taskInput}
-                    onChange={(e) => setTaskInput(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    placeholder="What needs to get done?"
-                    className="w-full bg-gray-900 text-white text-lg px-6 py-4 rounded-lg border-2 border-gray-700 focus:border-blue-500 focus:outline-none mb-8"
-                />
+                <div className="flex gap-2 mb-8">
+                    <input
+                        type="text"
+                        value={taskInput}
+                        onChange={(e) => setTaskInput(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                        placeholder="What needs to get done?"
+                        className="flex-1 bg-gray-900 text-white text-lg px-6 py-4 rounded-lg border-2 border-gray-700 focus:border-blue-500 focus:outline-none"
+                    />
+                    <button
+                        onClick={handleAddTask}
+                        className="px-6 py-4 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg"
+                    >
+                        Add
+                    </button>
+                </div>
 
                 {/* Celebration Message */}
                 {tasks.length > 0 && activeTasks.length === 0 && (
@@ -223,34 +235,41 @@ export default function Home() {
                     </div>
                 )}
 
-                {/* Completed Tasks */}
+                {/* Completed Tasks (collapsible) */}
                 {completedTasks.length > 0 && (
                     <div className="mb-8">
-                        <h2 className="text-xl font-bold mb-4 text-gray-300">Completed Tasks</h2>
-                        <div className="space-y-3">
-                            {completedTasks.map((task) => (
-                                <div
-                                    key={task.id}
-                                    className="bg-gray-900 px-6 py-4 rounded-lg border-2 border-green-900 flex items-center justify-between opacity-60"
-                                >
-                                    <p className="text-lg flex-1 line-through text-gray-500">{task.title}</p>
-                                    <div className="flex gap-2">
-                                        <button
-                                            onClick={() => toggleComplete(task.id)}
-                                            className="px-4 py-2 rounded bg-green-600 hover:bg-green-700"
-                                        >
-                                            ✓ Done
-                                        </button>
-                                        <button
-                                            onClick={() => handleDeleteTask(task.id)}
-                                            className="px-4 py-2 rounded bg-red-900 hover:bg-red-800 text-sm"
-                                        >
-                                            Delete
-                                        </button>
+                        <button
+                            onClick={() => setShowCompleted(!showCompleted)}
+                            className="text-gray-400 hover:text-gray-300 text-sm font-bold mb-4"
+                        >
+                            {showCompleted ? 'Hide' : 'Show'} completed ({completedTasks.length})
+                        </button>
+                        {showCompleted && (
+                            <div className="space-y-3 mt-4">
+                                {completedTasks.map((task) => (
+                                    <div
+                                        key={task.id}
+                                        className="bg-gray-900 px-6 py-4 rounded-lg border-2 border-green-900 flex items-center justify-between opacity-60"
+                                    >
+                                        <p className="text-lg flex-1 line-through text-gray-500">{task.title}</p>
+                                        <div className="flex gap-2">
+                                            <button
+                                                onClick={() => toggleComplete(task.id)}
+                                                className="px-4 py-2 rounded bg-green-600 hover:bg-green-700"
+                                            >
+                                                ✓ Done
+                                            </button>
+                                            <button
+                                                onClick={() => handleDeleteTask(task.id)}
+                                                className="px-4 py-2 rounded bg-red-900 hover:bg-red-800 text-sm"
+                                            >
+                                                Delete
+                                            </button>
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
-                        </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 )}
 
