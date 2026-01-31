@@ -103,13 +103,19 @@ export async function GET(request: NextRequest) {
 
   // Build tasks HTML
   const catBadge = (t: { category?: string | null }) => t.category ? ` <span style="color:#9ca3af;font-size:12px;">[${t.category}]</span>` : '';
+  const fmtDue = (d: string) => new Date(d + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  const dueBadge = (t: { due_date?: string | null }) => {
+    if (!t.due_date) return '';
+    const overdue = t.due_date < today;
+    return ` <span style="color:${overdue ? '#ef4444' : '#9ca3af'};font-size:12px;">${overdue ? '⚠️ OVERDUE' : 'Due'} ${fmtDue(t.due_date)}</span>`;
+  };
 
   const completedTasksHtml = completedTasks.length > 0
-    ? completedTasks.map((t) => `<li style="color:#22c55e;">✅ ${t.title}${catBadge(t)}</li>`).join("")
+    ? completedTasks.map((t) => `<li style="color:#22c55e;">✅ ${t.title}${catBadge(t)}${dueBadge(t)}</li>`).join("")
     : '<li style="color:#9ca3af;">No tasks completed</li>';
 
   const incompleteTasksHtml = incompleteTasks.length > 0
-    ? incompleteTasks.map((t) => `<li style="color:#ef4444;">❌ ${t.title}${catBadge(t)}</li>`).join("")
+    ? incompleteTasks.map((t) => `<li style="color:#ef4444;">❌ ${t.title}${catBadge(t)}${dueBadge(t)}</li>`).join("")
     : "";
 
   // Score summary

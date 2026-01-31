@@ -18,6 +18,7 @@ export interface Task {
   completed: boolean;
   priority: Priority;
   category: Category | null;
+  due_date: string | null;
   created_at: string;
 }
 
@@ -40,13 +41,14 @@ export async function getTasks(): Promise<{ data: Task[] | null; error: string |
 export async function createTask(
   title: string,
   priority: Priority = "medium",
-  category: Category | null = null
+  category: Category | null = null,
+  due_date: string | null = null
 ): Promise<{ data: Task | null; error: string | null }> {
   const supabase = getSupabaseAdmin();
 
   const { data, error } = await supabase
     .from("tasks")
-    .insert([{ title, completed: false, priority, category }])
+    .insert([{ title, completed: false, priority, category, due_date }])
     .select()
     .single();
 

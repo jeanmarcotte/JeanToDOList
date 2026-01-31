@@ -104,12 +104,15 @@ export async function GET(request: NextRequest) {
   }
 
   const priorityIcon = (p: string) => p === 'high' ? '🔴' : p === 'medium' ? '🟡' : '⚪';
+  const fmtDue = (d: string) => new Date(d + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
   const tasksHtml =
     tasks && tasks.length > 0
       ? `<ul style="padding-left:20px;">${tasks.map((t) => {
           const cat = t.category ? ` <span style="color:#9ca3af;font-size:12px;">[${t.category}]</span>` : '';
-          return `<li>${priorityIcon(t.priority)} ${t.title}${cat}</li>`;
+          const overdue = t.due_date && t.due_date < today;
+          const due = t.due_date ? ` <span style="color:${overdue ? '#ef4444' : '#9ca3af'};font-size:12px;">${overdue ? '⚠️ OVERDUE' : 'Due'} ${fmtDue(t.due_date)}</span>` : '';
+          return `<li>${priorityIcon(t.priority)} ${t.title}${cat}${due}</li>`;
         }).join("")}</ul>`
       : '<p style="color:#22c55e;">All tasks completed! Nothing pending.</p>';
 

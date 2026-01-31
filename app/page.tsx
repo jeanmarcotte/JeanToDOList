@@ -24,6 +24,7 @@ export default function Home() {
     const [taskInput, setTaskInput] = useState('');
     const [newPriority, setNewPriority] = useState<Priority>('medium');
     const [newCategory, setNewCategory] = useState<Category | ''>('');
+    const [newDueDate, setNewDueDate] = useState('');
     const [filterPriority, setFilterPriority] = useState<Priority | 'all'>('all');
     const [filterCategory, setFilterCategory] = useState<Category | 'all'>('all');
     const [tasks, setTasks] = useState<Task[]>([]);
@@ -56,7 +57,8 @@ export default function Home() {
             const { data, error } = await createTask(
                 taskInput,
                 newPriority,
-                newCategory || null
+                newCategory || null,
+                newDueDate || null
             );
             if (error) throw new Error(error);
             if (data) {
@@ -64,6 +66,7 @@ export default function Home() {
                 setTaskInput('');
                 setNewPriority('medium');
                 setNewCategory('');
+                setNewDueDate('');
             }
         } catch (error) {
             console.error('Error adding task:', error);
@@ -119,7 +122,17 @@ export default function Home() {
     };
 
     const priorityOrder: Record<string, number> = { high: 0, medium: 1, low: 2 };
-    const sortByPriority = (a: Task, b: Task) => (priorityOrder[a.priority] ?? 1) - (priorityOrder[b.priority] ?? 1);
+    const sortTasks = (a: Task, b: Task) => {
+        const priDiff = (priorityOrder[a.priority] ?? 1) - (priorityOrder[b.priority] ?? 1);
+        if (priDiff !== 0) return priDiff;
+        // Within same priority: tasks with due dates first, earlier dates first
+        if (a.due_date && !b.due_date) return -1;
+        if (!a.due_date && b.due_date) return 1;
+        if (a.due_date && b.due_date) return a.due_date.localeCompare(b.due_date);
+        return 0;
+    };
+
+    const todayStr = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
 
     const filterTasks = (list: Task[]) => {
         let filtered = list;
@@ -128,8 +141,14 @@ export default function Home() {
         return filtered;
     };
 
-    const activeTasks = filterTasks(tasks.filter(t => !t.completed)).sort(sortByPriority);
-    const completedTasks = filterTasks(tasks.filter(t => t.completed)).sort(sortByPriority);
+    const activeTasks = filterTasks(tasks.filter(t => !t.completed)).sort(sortTasks);
+    const completedTasks = filterTasks(tasks.filter(t => t.completed)).sort(sortTasks);
+
+    const formatDueDate = (date: string) => {
+        const d = new Date(date + 'T12:00:00');
+        return 'Due ' + d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    };
+    const isOverdue = (date: string) => date < todayStr;
 
     if (loading) {
         return (
@@ -228,7 +247,7 @@ export default function Home() {
                             Add
                         </button>
                     </div>
-                    <div className="flex gap-2 mt-2">
+                    <div className="flex flex-wrap gap-2 mt-2">
                         <select
                             value={newPriority}
                             onChange={(e) => setNewPriority(e.target.value as Priority)}
@@ -248,6 +267,13 @@ export default function Home() {
                                 <option key={c} value={c}>{c}</option>
                             ))}
                         </select>
+                        <input
+                            type="date"
+                            value={newDueDate}
+                            onChange={(e) => setNewDueDate(e.target.value)}
+                            className="bg-gray-900 text-white text-sm px-3 py-2 rounded-lg border border-gray-700 focus:border-blue-500 focus:outline-none"
+                            placeholder="Due date"
+                        />
                     </div>
                 </div>
 
@@ -311,6 +337,11 @@ export default function Home() {
                                             {task.category && (
                                                 <span className="text-xs px-2 py-0.5 rounded-full bg-gray-700 text-gray-400">{task.category}</span>
                                             )}
+                                            {task.due_date && (
+                                                <span className={`text-xs px-2 py-0.5 rounded-full ${
+                                                    isOverdue(task.due_date) ? 'bg-red-900 text-red-300' : 'bg-gray-700 text-gray-400'
+                                                }`}>{formatDueDate(task.due_date)}</span>
+                                            )}
                                         </div>
                                     </div>
                                     <div className="flex gap-2 ml-2 shrink-0">
@@ -354,6 +385,9 @@ export default function Home() {
                                                 <p className="text-lg line-through text-gray-500">{task.title}</p>
                                                 {task.category && (
                                                     <span className="text-xs px-2 py-0.5 rounded-full bg-gray-700 text-gray-500">{task.category}</span>
+                                                )}
+                                                {task.due_date && (
+                                                    <span className="text-xs px-2 py-0.5 rounded-full bg-gray-700 text-gray-500">{formatDueDate(task.due_date)}</span>
                                                 )}
                                             </div>
                                         </div>
