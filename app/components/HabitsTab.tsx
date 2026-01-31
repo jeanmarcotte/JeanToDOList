@@ -73,7 +73,7 @@ export default function HabitsTab() {
 
             {/* Habit list */}
             <div className="space-y-3">
-                {visibleHabits.map(({ habit, completed, skipped }) => {
+                {visibleHabits.map(({ habit, completed, skipped, skipReason }) => {
                     const isCriticalIncomplete = habit.critical && !completed && !skipped;
 
                     return (
@@ -102,7 +102,7 @@ export default function HabitsTab() {
                                 </span>
                                 {skipped && (
                                     <span className="ml-2 text-xs bg-yellow-800 text-yellow-300 px-2 py-0.5 rounded">
-                                        Wedding/show day — skipped
+                                        {skipReason || 'Skip day'} — skipped
                                     </span>
                                 )}
                             </div>
