@@ -33,6 +33,24 @@ export async function getSkipDays(): Promise<{
   return { data, error: null };
 }
 
+export async function getTodaySkipDay(): Promise<{
+  data: { reason: string } | null;
+  error: string | null;
+}> {
+  const supabase = getSupabaseAdmin();
+  const today = new Date().toISOString().split("T")[0];
+  const { data, error } = await supabase
+    .from("skip_days")
+    .select("reason")
+    .eq("date", today)
+    .maybeSingle();
+
+  if (error) {
+    return { data: null, error: error.message };
+  }
+  return { data, error: null };
+}
+
 export async function addSkipDay(
   date: string,
   reason: string,

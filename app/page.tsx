@@ -12,6 +12,7 @@ import {
     getCompletedCount,
 } from '@/actions/tasks';
 import { CATEGORIES } from '@/lib/constants';
+import { getTodaySkipDay } from '@/actions/skip-days';
 import Link from 'next/link';
 import Celebration from "./components/Celebration";
 import StakesTab from "./components/StakesTab";
@@ -34,9 +35,13 @@ export default function Home() {
     const [loading, setLoading] = useState(true);
     const [showCelebration, setShowCelebration] = useState(false);
     const [milestone, setMilestone] = useState(0);
+    const [skipDayReason, setSkipDayReason] = useState<string | null>(null);
 
     useEffect(() => {
         loadTasks();
+        getTodaySkipDay().then(({ data }) => {
+            if (data) setSkipDayReason(data.reason);
+        });
     }, []);
 
     const loadTasks = async () => {
@@ -170,8 +175,11 @@ export default function Home() {
                         </svg>
                     </Link>
                 </div>
-                <p className="text-xl text-gray-400 mb-6 text-center">
-                    The app that makes sure it gets done.
+                <p className="text-lg text-gray-400 mb-6 text-center">
+                    {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                    {skipDayReason === 'Wedding' && (
+                        <span className="ml-2 text-yellow-300 font-bold">Wedding Day!</span>
+                    )}
                 </p>
 
                 {/* Tab Bar */}
