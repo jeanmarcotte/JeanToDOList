@@ -12,8 +12,6 @@ function getSupabaseAdmin() {
 export type Priority = "high" | "medium" | "low";
 export type Category = "SIGS" | "PPJ" | "Accounting" | "Personal";
 
-export const CATEGORIES: Category[] = ["SIGS", "PPJ", "Accounting", "Personal"];
-
 export interface Task {
   id: number;
   title: string;

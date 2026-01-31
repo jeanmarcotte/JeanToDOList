@@ -5,13 +5,13 @@ import {
     Task,
     Priority,
     Category,
-    CATEGORIES,
     getTasks,
     createTask,
     updateTaskCompletion,
     deleteTask,
     getCompletedCount,
 } from '@/actions/tasks';
+import { CATEGORIES } from '@/lib/constants';
 import Link from 'next/link';
 import Celebration from "./components/Celebration";
 import StakesTab from "./components/StakesTab";
