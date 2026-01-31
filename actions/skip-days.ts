@@ -60,7 +60,7 @@ export async function addSkipDay(
 
   const { error } = await supabase
     .from("skip_days")
-    .insert({ date, reason, auto_recovery: autoRecovery });
+    .upsert({ date, reason, auto_recovery: autoRecovery }, { onConflict: "date" });
 
   if (error) {
     return { error: error.message };
@@ -74,7 +74,7 @@ export async function addSkipDay(
 
     const { error: recoveryError } = await supabase
       .from("skip_days")
-      .insert({ date: nextDateStr, reason: "Recovery", auto_recovery: false });
+      .upsert({ date: nextDateStr, reason: "Recovery", auto_recovery: false }, { onConflict: "date" });
 
     if (recoveryError) {
       return { error: `Skip day added but recovery day failed: ${recoveryError.message}` };

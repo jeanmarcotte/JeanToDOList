@@ -7,12 +7,19 @@ import { Habit, getHabits, createHabit, updateHabit, deleteHabit } from '@/actio
 
 const REASON_OPTIONS = ['Wedding', 'Bridal Show', 'Birthday', 'Recovery', 'Vacation', 'Other'];
 const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+function daysInMonth(month: number, year: number): number {
+    return new Date(year, month, 0).getDate();
+}
 
 export default function SettingsPage() {
     // Skip days state
     const [skipDays, setSkipDays] = useState<SkipDay[]>([]);
     const [skipLoading, setSkipLoading] = useState(true);
-    const [date, setDate] = useState('');
+    const [skipMonth, setSkipMonth] = useState(new Date().getMonth() + 1);
+    const [skipDay, setSkipDay] = useState(new Date().getDate());
+    const [skipYear, setSkipYear] = useState(new Date().getFullYear());
     const [reason, setReason] = useState('Wedding');
     const [autoRecovery, setAutoRecovery] = useState(false);
     const [submittingSkip, setSubmittingSkip] = useState(false);
@@ -47,12 +54,12 @@ export default function SettingsPage() {
 
     const handleAddSkip = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!date || !reason) return;
+        if (!reason) return;
+        const date = `${skipYear}-${String(skipMonth).padStart(2, '0')}-${String(skipDay).padStart(2, '0')}`;
         setSubmittingSkip(true);
         try {
             const { error } = await addSkipDay(date, reason, autoRecovery);
             if (error) throw new Error(error);
-            setDate('');
             setAutoRecovery(false);
             await loadSkipDays();
         } catch (error) {
@@ -334,30 +341,64 @@ export default function SettingsPage() {
                     {/* Add Form */}
                     <form onSubmit={handleAddSkip} className="mb-6 p-4 bg-gray-900 rounded-lg border-2 border-gray-700 space-y-4">
                         <h3 className="text-lg font-bold text-gray-300">Add Skip Day</h3>
-                        <div className="flex flex-col sm:flex-row gap-3">
-                            <input
-                                type="date"
-                                value={date}
-                                onChange={(e) => setDate(e.target.value)}
-                                required
-                                className="bg-gray-800 text-white px-4 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
-                            />
-                            <select
-                                value={reason}
-                                onChange={(e) => setReason(e.target.value)}
-                                className="bg-gray-800 text-white px-4 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
-                            >
-                                {REASON_OPTIONS.map(r => (
-                                    <option key={r} value={r}>{r}</option>
-                                ))}
-                            </select>
-                            <button
-                                type="submit"
-                                disabled={submittingSkip}
-                                className="px-6 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white font-bold disabled:opacity-50"
-                            >
-                                {submittingSkip ? 'Adding...' : 'Add'}
-                            </button>
+                        <div className="flex flex-col gap-3">
+                            <div className="flex gap-2">
+                                <select
+                                    value={skipMonth}
+                                    onChange={(e) => {
+                                        const m = Number(e.target.value);
+                                        setSkipMonth(m);
+                                        const maxDay = daysInMonth(m, skipYear);
+                                        if (skipDay > maxDay) setSkipDay(maxDay);
+                                    }}
+                                    className="bg-gray-800 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none flex-1"
+                                >
+                                    {MONTH_NAMES.map((name, i) => (
+                                        <option key={i} value={i + 1}>{name}</option>
+                                    ))}
+                                </select>
+                                <select
+                                    value={skipDay}
+                                    onChange={(e) => setSkipDay(Number(e.target.value))}
+                                    className="bg-gray-800 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none w-20"
+                                >
+                                    {Array.from({ length: daysInMonth(skipMonth, skipYear) }, (_, i) => (
+                                        <option key={i + 1} value={i + 1}>{i + 1}</option>
+                                    ))}
+                                </select>
+                                <select
+                                    value={skipYear}
+                                    onChange={(e) => {
+                                        const y = Number(e.target.value);
+                                        setSkipYear(y);
+                                        const maxDay = daysInMonth(skipMonth, y);
+                                        if (skipDay > maxDay) setSkipDay(maxDay);
+                                    }}
+                                    className="bg-gray-800 text-white px-3 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none w-24"
+                                >
+                                    {[skipYear - 1, skipYear, skipYear + 1, skipYear + 2].map(y => (
+                                        <option key={y} value={y}>{y}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="flex gap-3">
+                                <select
+                                    value={reason}
+                                    onChange={(e) => setReason(e.target.value)}
+                                    className="bg-gray-800 text-white px-4 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none flex-1"
+                                >
+                                    {REASON_OPTIONS.map(r => (
+                                        <option key={r} value={r}>{r}</option>
+                                    ))}
+                                </select>
+                                <button
+                                    type="submit"
+                                    disabled={submittingSkip}
+                                    className="px-6 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white font-bold disabled:opacity-50"
+                                >
+                                    {submittingSkip ? 'Adding...' : 'Add'}
+                                </button>
+                            </div>
                         </div>
                         <label className="flex items-center gap-2 text-sm text-gray-400">
                             <input
