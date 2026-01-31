@@ -17,6 +17,8 @@ const HABITS = [
   { key: "google_business", label: "Post on Google Business", days: [2, 5], skippable: true, critical: false },
   { key: "check_weight", label: "Check weight", days: [0, 1, 2, 3, 4, 5, 6], skippable: true, critical: false },
   { key: "drink_water", label: "Drink 1 litre of water", days: [0, 1, 2, 3, 4, 5, 6], skippable: true, critical: false },
+  { key: "brush_teeth_floss", label: "Brush teeth & floss", days: [0, 1, 2, 3, 4, 5, 6], skippable: true, critical: false },
+  { key: "shower", label: "Shower", days: [0, 1, 2, 3, 4, 5, 6], skippable: true, critical: false },
 ];
 
 const SHAME_MESSAGES = [

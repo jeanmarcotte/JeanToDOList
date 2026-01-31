@@ -62,6 +62,20 @@ const HABITS: Habit[] = [
     skippable: true,
     critical: false,
   },
+  {
+    key: "brush_teeth_floss",
+    label: "Brush teeth & floss",
+    days: [0, 1, 2, 3, 4, 5, 6],
+    skippable: true,
+    critical: false,
+  },
+  {
+    key: "shower",
+    label: "Shower",
+    days: [0, 1, 2, 3, 4, 5, 6],
+    skippable: true,
+    critical: false,
+  },
 ];
 
 function getTodayDateString(): string {
