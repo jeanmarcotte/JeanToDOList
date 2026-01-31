@@ -11,15 +11,6 @@ function getSupabaseAdmin() {
   );
 }
 
-const HABITS = [
-  { key: "heart_meds", label: "Take heart meds", days: [0, 1, 2, 3, 4, 5, 6], skippable: false, critical: true },
-  { key: "post_meta", label: "Post on Meta", days: [0, 1, 2, 3, 4, 5, 6], skippable: true, critical: false },
-  { key: "google_business", label: "Post on Google Business", days: [2, 5], skippable: true, critical: false },
-  { key: "check_weight", label: "Check weight", days: [0, 1, 2, 3, 4, 5, 6], skippable: true, critical: false },
-  { key: "drink_water", label: "Drink 1 litre of water", days: [0, 1, 2, 3, 4, 5, 6], skippable: true, critical: false },
-  { key: "brush_teeth_floss", label: "Brush teeth & floss", days: [0, 1, 2, 3, 4, 5, 6], skippable: true, critical: false },
-  { key: "shower", label: "Shower", days: [0, 1, 2, 3, 4, 5, 6], skippable: true, critical: false },
-];
 
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get("authorization");
@@ -52,9 +43,16 @@ export async function GET(request: NextRequest) {
     .eq("date", today)
     .maybeSingle();
 
+  // Fetch habits from DB
+  const { data: allHabits } = await supabase
+    .from("habits")
+    .select("*")
+    .eq("active", true)
+    .order("sort_order", { ascending: true });
+
   // Today's applicable habits
-  const todayHabits = HABITS.filter((h) => h.days.includes(dayOfWeek));
-  const habitSection = todayHabits.map((h) => {
+  const todayHabits = (allHabits || []).filter((h: { specific_days: number[] }) => h.specific_days.includes(dayOfWeek));
+  const habitSection = todayHabits.map((h: { label: string; skippable: boolean; critical: boolean }) => {
     const isSkipped = skipDay && h.skippable;
     const tag = h.critical ? ' <span style="color:#ef4444;font-weight:bold;">[CRITICAL]</span>' : "";
     if (isSkipped) {
