@@ -101,9 +101,14 @@ export async function GET(request: NextRequest) {
       .join("");
   }
 
+  const priorityIcon = (p: string) => p === 'high' ? '🔴' : p === 'medium' ? '🟡' : '⚪';
+
   const tasksHtml =
     tasks && tasks.length > 0
-      ? `<ul style="padding-left:20px;">${tasks.map((t) => `<li>${t.title}</li>`).join("")}</ul>`
+      ? `<ul style="padding-left:20px;">${tasks.map((t) => {
+          const cat = t.category ? ` <span style="color:#9ca3af;font-size:12px;">[${t.category}]</span>` : '';
+          return `<li>${priorityIcon(t.priority)} ${t.title}${cat}</li>`;
+        }).join("")}</ul>`
       : '<p style="color:#22c55e;">All tasks completed! Nothing pending.</p>';
 
   const html = `

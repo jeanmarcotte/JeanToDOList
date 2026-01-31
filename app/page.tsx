@@ -3,6 +3,9 @@
 import { useState, useEffect } from 'react';
 import {
     Task,
+    Priority,
+    Category,
+    CATEGORIES,
     getTasks,
     createTask,
     updateTaskCompletion,
@@ -19,6 +22,10 @@ type Tab = 'tasks' | 'stakes' | 'habits';
 export default function Home() {
     const [activeTab, setActiveTab] = useState<Tab>('tasks');
     const [taskInput, setTaskInput] = useState('');
+    const [newPriority, setNewPriority] = useState<Priority>('medium');
+    const [newCategory, setNewCategory] = useState<Category | ''>('');
+    const [filterPriority, setFilterPriority] = useState<Priority | 'all'>('all');
+    const [filterCategory, setFilterCategory] = useState<Category | 'all'>('all');
     const [tasks, setTasks] = useState<Task[]>([]);
     const [deletedTasks, setDeletedTasks] = useState<string[]>([]);
     const [showShameLog, setShowShameLog] = useState(false);
@@ -46,11 +53,17 @@ export default function Home() {
     const handleAddTask = async () => {
         if (!taskInput.trim()) return;
         try {
-            const { data, error } = await createTask(taskInput);
+            const { data, error } = await createTask(
+                taskInput,
+                newPriority,
+                newCategory || null
+            );
             if (error) throw new Error(error);
             if (data) {
                 setTasks([data, ...tasks]);
                 setTaskInput('');
+                setNewPriority('medium');
+                setNewCategory('');
             }
         } catch (error) {
             console.error('Error adding task:', error);
@@ -105,8 +118,18 @@ export default function Home() {
         }
     };
 
-    const activeTasks = tasks.filter(t => !t.completed);
-    const completedTasks = tasks.filter(t => t.completed);
+    const priorityOrder: Record<string, number> = { high: 0, medium: 1, low: 2 };
+    const sortByPriority = (a: Task, b: Task) => (priorityOrder[a.priority] ?? 1) - (priorityOrder[b.priority] ?? 1);
+
+    const filterTasks = (list: Task[]) => {
+        let filtered = list;
+        if (filterPriority !== 'all') filtered = filtered.filter(t => t.priority === filterPriority);
+        if (filterCategory !== 'all') filtered = filtered.filter(t => t.category === filterCategory);
+        return filtered;
+    };
+
+    const activeTasks = filterTasks(tasks.filter(t => !t.completed)).sort(sortByPriority);
+    const completedTasks = filterTasks(tasks.filter(t => t.completed)).sort(sortByPriority);
 
     if (loading) {
         return (
@@ -188,21 +211,76 @@ export default function Home() {
                     )}
                 </div>
 
-                <div className="flex gap-2 mb-8">
-                    <input
-                        type="text"
-                        value={taskInput}
-                        onChange={(e) => setTaskInput(e.target.value)}
-                        onKeyDown={handleKeyDown}
-                        placeholder="What needs to get done?"
-                        className="flex-1 bg-gray-900 text-white text-lg px-6 py-4 rounded-lg border-2 border-gray-700 focus:border-blue-500 focus:outline-none"
-                    />
-                    <button
-                        onClick={handleAddTask}
-                        className="px-6 py-4 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg"
+                <div className="mb-8">
+                    <div className="flex gap-2">
+                        <input
+                            type="text"
+                            value={taskInput}
+                            onChange={(e) => setTaskInput(e.target.value)}
+                            onKeyDown={handleKeyDown}
+                            placeholder="What needs to get done?"
+                            className="flex-1 bg-gray-900 text-white text-lg px-6 py-4 rounded-lg border-2 border-gray-700 focus:border-blue-500 focus:outline-none"
+                        />
+                        <button
+                            onClick={handleAddTask}
+                            className="px-6 py-4 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg"
+                        >
+                            Add
+                        </button>
+                    </div>
+                    <div className="flex gap-2 mt-2">
+                        <select
+                            value={newPriority}
+                            onChange={(e) => setNewPriority(e.target.value as Priority)}
+                            className="bg-gray-900 text-white text-sm px-3 py-2 rounded-lg border border-gray-700 focus:border-blue-500 focus:outline-none"
+                        >
+                            <option value="high">High</option>
+                            <option value="medium">Medium</option>
+                            <option value="low">Low</option>
+                        </select>
+                        <select
+                            value={newCategory}
+                            onChange={(e) => setNewCategory(e.target.value as Category | '')}
+                            className="bg-gray-900 text-white text-sm px-3 py-2 rounded-lg border border-gray-700 focus:border-blue-500 focus:outline-none"
+                        >
+                            <option value="">No category</option>
+                            {CATEGORIES.map(c => (
+                                <option key={c} value={c}>{c}</option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
+
+                {/* Filters */}
+                <div className="flex flex-wrap gap-2 mb-6">
+                    <div className="flex gap-1">
+                        {(['all', 'high', 'medium', 'low'] as const).map(p => (
+                            <button
+                                key={p}
+                                onClick={() => setFilterPriority(p)}
+                                className={`px-3 py-1 rounded-full text-xs font-bold transition-colors ${
+                                    filterPriority === p
+                                        ? p === 'high' ? 'bg-red-600 text-white'
+                                            : p === 'medium' ? 'bg-yellow-600 text-white'
+                                            : p === 'low' ? 'bg-gray-600 text-white'
+                                            : 'bg-blue-600 text-white'
+                                        : 'bg-gray-800 text-gray-400 hover:text-white'
+                                }`}
+                            >
+                                {p === 'all' ? 'All' : p.charAt(0).toUpperCase() + p.slice(1)}
+                            </button>
+                        ))}
+                    </div>
+                    <select
+                        value={filterCategory}
+                        onChange={(e) => setFilterCategory(e.target.value as Category | 'all')}
+                        className="bg-gray-800 text-gray-400 text-xs px-3 py-1 rounded-full border-none focus:outline-none"
                     >
-                        Add
-                    </button>
+                        <option value="all">All categories</option>
+                        {CATEGORIES.map(c => (
+                            <option key={c} value={c}>{c}</option>
+                        ))}
+                    </select>
                 </div>
 
                 {/* Celebration Message */}
@@ -221,10 +299,21 @@ export default function Home() {
                             {activeTasks.map((task) => (
                                 <div
                                     key={task.id}
-                                    className="bg-gray-900 px-6 py-4 rounded-lg border-2 border-gray-700 flex items-center justify-between"
+                                    className={`bg-gray-900 px-6 py-4 rounded-lg border-2 border-gray-700 flex items-center justify-between ${
+                                        task.priority === 'high' ? 'border-l-4 border-l-red-500'
+                                        : task.priority === 'medium' ? 'border-l-4 border-l-yellow-500'
+                                        : ''
+                                    }`}
                                 >
-                                    <p className="text-lg flex-1">{task.title}</p>
-                                    <div className="flex gap-2">
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center gap-2 flex-wrap">
+                                            <p className="text-lg">{task.title}</p>
+                                            {task.category && (
+                                                <span className="text-xs px-2 py-0.5 rounded-full bg-gray-700 text-gray-400">{task.category}</span>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-2 ml-2 shrink-0">
                                         <button
                                             onClick={() => toggleComplete(task.id)}
                                             className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700"
@@ -260,8 +349,15 @@ export default function Home() {
                                         key={task.id}
                                         className="bg-gray-900 px-6 py-4 rounded-lg border-2 border-green-900 flex items-center justify-between opacity-60"
                                     >
-                                        <p className="text-lg flex-1 line-through text-gray-500">{task.title}</p>
-                                        <div className="flex gap-2">
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-center gap-2 flex-wrap">
+                                                <p className="text-lg line-through text-gray-500">{task.title}</p>
+                                                {task.category && (
+                                                    <span className="text-xs px-2 py-0.5 rounded-full bg-gray-700 text-gray-500">{task.category}</span>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <div className="flex gap-2 ml-2 shrink-0">
                                             <button
                                                 onClick={() => toggleComplete(task.id)}
                                                 className="px-4 py-2 rounded bg-green-600 hover:bg-green-700"

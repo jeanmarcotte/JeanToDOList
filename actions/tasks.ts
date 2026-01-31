@@ -9,16 +9,24 @@ function getSupabaseAdmin() {
   return createClient(supabaseUrl, supabaseServiceKey);
 }
 
+export type Priority = "high" | "medium" | "low";
+export type Category = "SIGS" | "PPJ" | "Accounting" | "Personal";
+
+export const CATEGORIES: Category[] = ["SIGS", "PPJ", "Accounting", "Personal"];
+
 export interface Task {
   id: number;
   title: string;
   completed: boolean;
+  priority: Priority;
+  category: Category | null;
   created_at: string;
 }
 
 export async function getTasks(): Promise<{ data: Task[] | null; error: string | null }> {
   const supabase = getSupabaseAdmin();
 
+  // Custom ordering: high first, then medium, then low, then by created_at desc
   const { data, error } = await supabase
     .from("tasks")
     .select("*")
@@ -32,13 +40,15 @@ export async function getTasks(): Promise<{ data: Task[] | null; error: string |
 }
 
 export async function createTask(
-  title: string
+  title: string,
+  priority: Priority = "medium",
+  category: Category | null = null
 ): Promise<{ data: Task | null; error: string | null }> {
   const supabase = getSupabaseAdmin();
 
   const { data, error } = await supabase
     .from("tasks")
-    .insert([{ title, completed: false }])
+    .insert([{ title, completed: false, priority, category }])
     .select()
     .single();
 
