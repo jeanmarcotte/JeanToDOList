@@ -27,7 +27,9 @@ export async function GET(request: NextRequest) {
   }
 
   const supabase = getSupabaseAdmin();
-  const today = new Date().toLocaleDateString("en-CA", { timeZone: "America/Toronto" }); // YYYY-MM-DD
+  // Runs after midnight — report on YESTERDAY (the day that just ended)
+  const today = new Date(Date.now() - 24 * 60 * 60 * 1000)
+    .toLocaleDateString("en-CA", { timeZone: "America/Toronto" }); // YYYY-MM-DD
   const dayOfWeek = new Date(today + "T12:00:00").getDay();
   const dateDisplay = new Date(today + "T12:00:00").toLocaleDateString("en-US", {
     weekday: "long",
