@@ -32,12 +32,27 @@ export interface HabitStatus {
   newMilestone: number | null;
 }
 
-function getTodayDateString(): string {
-  return new Date().toISOString().split("T")[0];
+const TZ = "America/Toronto";
+
+function torontoDateString(date: Date = new Date()): string {
+  return date.toLocaleDateString("en-CA", { timeZone: TZ }); // YYYY-MM-DD
 }
 
+function torontoDayOfWeek(date: Date = new Date()): number {
+  // Return 0=Sunday..6=Saturday in Toronto time
+  const parts = new Intl.DateTimeFormat("en-US", { timeZone: TZ, weekday: "short" }).formatToParts(date);
+  const weekday = parts.find(p => p.type === "weekday")?.value || "";
+  const map: Record<string, number> = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+  return map[weekday] ?? 0;
+}
+
+function getTodayDateString(): string {
+  return torontoDateString();
+}
+
+// Format a Date to YYYY-MM-DD in Toronto timezone
 function getDateString(date: Date): string {
-  return date.toISOString().split("T")[0];
+  return torontoDateString(date);
 }
 
 function isDayApplicable(habit: Habit, dayOfWeek: number): boolean {
@@ -104,7 +119,7 @@ function calculateStreaksAndMissed(
     let streakBroken = false;
     for (let i = 0; i < 365 && !streakBroken; i++) {
       const dateStr = getDateString(cursor);
-      const dayOfWeek = cursor.getDay();
+      const dayOfWeek = torontoDayOfWeek(cursor);
 
       // Skip non-applicable days
       if (!isDayApplicable(habit, dayOfWeek)) {
@@ -132,7 +147,7 @@ function calculateStreaksAndMissed(
     let missedBroken = false;
     for (let i = 0; i < 365 && !missedBroken; i++) {
       const dateStr = getDateString(cursor2);
-      const dayOfWeek = cursor2.getDay();
+      const dayOfWeek = torontoDayOfWeek(cursor2);
 
       if (!isDayApplicable(habit, dayOfWeek)) {
         cursor2.setDate(cursor2.getDate() - 1);
@@ -215,7 +230,7 @@ export async function getTodayHabits(): Promise<{
       skipDaysResult.data || []
     );
 
-    const dayOfWeek = new Date().getDay();
+    const dayOfWeek = torontoDayOfWeek();
 
     const statuses: HabitStatus[] = habits.map((habit) => {
       const applicable = isDayApplicable(habit, dayOfWeek);

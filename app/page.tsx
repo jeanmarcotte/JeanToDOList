@@ -36,12 +36,36 @@ export default function Home() {
     const [showCelebration, setShowCelebration] = useState(false);
     const [milestone, setMilestone] = useState(0);
     const [skipDayReason, setSkipDayReason] = useState<string | null>(null);
+    const [torontoTime, setTorontoTime] = useState('');
 
     useEffect(() => {
         loadTasks();
         getTodaySkipDay().then(({ data }) => {
             if (data) setSkipDayReason(data.reason);
         });
+    }, []);
+
+    // Live clock in Toronto timezone
+    useEffect(() => {
+        const tick = () => {
+            const now = new Date();
+            setTorontoTime(
+                now.toLocaleString('en-US', {
+                    timeZone: 'America/Toronto',
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: true,
+                })
+            );
+        };
+        tick();
+        const id = setInterval(tick, 1000);
+        return () => clearInterval(id);
     }, []);
 
     const loadTasks = async () => {
@@ -137,7 +161,7 @@ export default function Home() {
         return 0;
     };
 
-    const todayStr = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
+    const todayStr = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Toronto' }); // YYYY-MM-DD
 
     const filterTasks = (list: Task[]) => {
         let filtered = list;
@@ -176,7 +200,7 @@ export default function Home() {
                     </Link>
                 </div>
                 <p className="text-lg text-gray-400 mb-6 text-center">
-                    {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                    {torontoTime ? `${torontoTime} Toronto Time` : '\u00A0'}
                     {skipDayReason === 'Wedding' && (
                         <span className="ml-2 text-yellow-300 font-bold">Wedding Day!</span>
                     )}

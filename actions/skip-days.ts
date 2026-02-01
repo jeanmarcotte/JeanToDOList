@@ -38,7 +38,7 @@ export async function getTodaySkipDay(): Promise<{
   error: string | null;
 }> {
   const supabase = getSupabaseAdmin();
-  const today = new Date().toISOString().split("T")[0];
+  const today = new Date().toLocaleDateString("en-CA", { timeZone: "America/Toronto" });
   const { data, error } = await supabase
     .from("skip_days")
     .select("reason")
@@ -68,9 +68,9 @@ export async function addSkipDay(
 
   // If auto-recovery is enabled, also insert the next day as a Recovery entry
   if (autoRecovery) {
-    const nextDay = new Date(date + "T00:00:00");
+    const nextDay = new Date(date + "T12:00:00");
     nextDay.setDate(nextDay.getDate() + 1);
-    const nextDateStr = nextDay.toISOString().split("T")[0];
+    const nextDateStr = nextDay.toLocaleDateString("en-CA", { timeZone: "America/Toronto" });
 
     const { error: recoveryError } = await supabase
       .from("skip_days")
