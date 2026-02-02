@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { HabitStatus, getTodayHabits, toggleHabit } from '@/actions/habits';
 import Celebration from './Celebration';
 
@@ -99,23 +98,13 @@ export default function HabitsTab() {
                 />
             )}
 
-            {/* Header with settings gear */}
-            <div className="flex items-center justify-between mb-6">
-                <div className="flex-1" />
-                <div className="text-center flex-1">
+            {/* Header */}
+            <div className="flex items-center justify-center mb-6">
+                <div className="text-center">
                     <span className="text-3xl font-bold text-green-400">
                         {completedCount} / {totalCount}
                     </span>
                     <p className="text-gray-500 text-sm mt-1">habits completed today</p>
-                </div>
-                <div className="flex-1 text-right">
-                    <Link
-                        href="/settings"
-                        className="text-gray-500 hover:text-white transition-colors text-xl"
-                        title="Manage habits"
-                    >
-                        ⚙️
-                    </Link>
                 </div>
             </div>
 

@@ -110,26 +110,27 @@ function calculateStreaksAndMissed(
     let missedDays = 0;
     const habitLogs = logsByHabit.get(habit.habit_key) || new Set<string>();
 
-    // Walk backward from yesterday
-    const now = new Date();
-    const cursor = new Date(now);
-    cursor.setDate(cursor.getDate() - 1); // start at yesterday
+    // Anchor to Toronto's today at UTC noon to prevent timezone drift
+    const todayStr = torontoDateString();
+    const [ty, tm, td] = todayStr.split('-').map(Number);
+    const cursor = new Date(Date.UTC(ty, tm - 1, td, 12, 0, 0));
+    cursor.setUTCDate(cursor.getUTCDate() - 1); // start at yesterday
 
     // Calculate streak (consecutive completed days)
     let streakBroken = false;
     for (let i = 0; i < 365 && !streakBroken; i++) {
-      const dateStr = getDateString(cursor);
-      const dayOfWeek = torontoDayOfWeek(cursor);
+      const dateStr = cursor.toISOString().slice(0, 10);
+      const dayOfWeek = cursor.getUTCDay();
 
       // Skip non-applicable days
       if (!isDayApplicable(habit, dayOfWeek)) {
-        cursor.setDate(cursor.getDate() - 1);
+        cursor.setUTCDate(cursor.getUTCDate() - 1);
         continue;
       }
 
       // Skip days (for skippable habits) don't break or count
       if (habit.skippable && skipDayMap.has(dateStr)) {
-        cursor.setDate(cursor.getDate() - 1);
+        cursor.setUTCDate(cursor.getUTCDate() - 1);
         continue;
       }
 
@@ -138,24 +139,24 @@ function calculateStreaksAndMissed(
       } else {
         streakBroken = true;
       }
-      cursor.setDate(cursor.getDate() - 1);
+      cursor.setUTCDate(cursor.getUTCDate() - 1);
     }
 
     // Calculate missed days (consecutive missed days from yesterday)
-    const cursor2 = new Date(now);
-    cursor2.setDate(cursor2.getDate() - 1);
+    const cursor2 = new Date(Date.UTC(ty, tm - 1, td, 12, 0, 0));
+    cursor2.setUTCDate(cursor2.getUTCDate() - 1);
     let missedBroken = false;
     for (let i = 0; i < 365 && !missedBroken; i++) {
-      const dateStr = getDateString(cursor2);
-      const dayOfWeek = torontoDayOfWeek(cursor2);
+      const dateStr = cursor2.toISOString().slice(0, 10);
+      const dayOfWeek = cursor2.getUTCDay();
 
       if (!isDayApplicable(habit, dayOfWeek)) {
-        cursor2.setDate(cursor2.getDate() - 1);
+        cursor2.setUTCDate(cursor2.getUTCDate() - 1);
         continue;
       }
 
       if (habit.skippable && skipDayMap.has(dateStr)) {
-        cursor2.setDate(cursor2.getDate() - 1);
+        cursor2.setUTCDate(cursor2.getUTCDate() - 1);
         continue;
       }
 
@@ -164,7 +165,7 @@ function calculateStreaksAndMissed(
       } else {
         missedBroken = true;
       }
-      cursor2.setDate(cursor2.getDate() - 1);
+      cursor2.setUTCDate(cursor2.getUTCDate() - 1);
     }
 
     result.set(habit.habit_key, { streak, missedDays });
@@ -244,7 +245,7 @@ export async function getTodayHabits(): Promise<{
         skipped,
         skipReason: skipped ? skipReason : null,
         applicable,
-        streak: stats.streak,
+        streak: completed ? stats.streak + 1 : stats.streak,
         missedDays: stats.missedDays,
         newMilestone: null,
       };

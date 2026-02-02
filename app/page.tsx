@@ -365,7 +365,7 @@ export default function Home() {
                                 >
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-2 flex-wrap">
-                                            <p className="text-lg">{task.title}</p>
+                                            <p className="text-lg break-words line-clamp-2">{task.title}</p>
                                             {task.category && (
                                                 <span className="text-xs px-2 py-0.5 rounded-full bg-gray-700 text-gray-400">{task.category}</span>
                                             )}
@@ -414,7 +414,7 @@ export default function Home() {
                                     >
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-center gap-2 flex-wrap">
-                                                <p className="text-lg line-through text-gray-500">{task.title}</p>
+                                                <p className="text-lg line-through text-gray-500 break-words line-clamp-2">{task.title}</p>
                                                 {task.category && (
                                                     <span className="text-xs px-2 py-0.5 rounded-full bg-gray-700 text-gray-500">{task.category}</span>
                                                 )}
