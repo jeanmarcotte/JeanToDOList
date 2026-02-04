@@ -305,6 +305,7 @@ export default function Home() {
                                 value={newDueDate}
                                 onChange={(e) => setNewDueDate(e.target.value)}
                                 className="bg-gray-900 text-white text-sm px-3 py-2 rounded-lg border border-gray-700 focus:border-blue-500 focus:outline-none"
+                                style={{ colorScheme: 'dark' }}
                                 placeholder="Due date"
                             />
                         </div>
