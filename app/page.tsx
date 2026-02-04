@@ -37,6 +37,7 @@ export default function Home() {
     const [milestone, setMilestone] = useState(0);
     const [skipDayReason, setSkipDayReason] = useState<string | null>(null);
     const [torontoTime, setTorontoTime] = useState('');
+    const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
     useEffect(() => {
         loadTasks();
@@ -244,191 +245,149 @@ export default function Home() {
                 {activeTab === 'habits' && <HabitsTab />}
 
                 {activeTab === 'tasks' && <>
-                {/* Stats */}
-                <div className="flex justify-center gap-6 mb-8 text-sm">
-                    <div className="text-center">
-                        <div className="text-2xl font-bold text-blue-500">{activeTasks.length}</div>
-                        <div className="text-gray-500">Active</div>
-                    </div>
-                    <div className="text-center">
-                        <div className="text-2xl font-bold text-green-500">{completedTasks.length}</div>
-                        <div className="text-gray-500">Completed</div>
-                    </div>
-                    {deletedTasks.length > 0 && (
+                    {/* Stats */}
+                    <div className="flex justify-center gap-6 mb-8 text-sm">
                         <div className="text-center">
-                            <div className="text-2xl font-bold text-red-500">{deletedTasks.length}</div>
-                            <div className="text-gray-500">Deleted</div>
+                            <div className="text-2xl font-bold text-blue-500">{activeTasks.length}</div>
+                            <div className="text-gray-500">Active</div>
                         </div>
-                    )}
-                </div>
-
-                <div className="mb-8">
-                    <div className="flex gap-2">
-                        <input
-                            type="text"
-                            value={taskInput}
-                            onChange={(e) => setTaskInput(e.target.value)}
-                            onKeyDown={handleKeyDown}
-                            placeholder="What needs to get done?"
-                            className="flex-1 bg-gray-900 text-white text-lg px-6 py-4 rounded-lg border-2 border-gray-700 focus:border-blue-500 focus:outline-none"
-                        />
-                        <button
-                            onClick={handleAddTask}
-                            className="px-6 py-4 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg"
-                        >
-                            Add
-                        </button>
+                        <div className="text-center">
+                            <div className="text-2xl font-bold text-green-500">{completedTasks.length}</div>
+                            <div className="text-gray-500">Completed</div>
+                        </div>
+                        {deletedTasks.length > 0 && (
+                            <div className="text-center">
+                                <div className="text-2xl font-bold text-red-500">{deletedTasks.length}</div>
+                                <div className="text-gray-500">Deleted</div>
+                            </div>
+                        )}
                     </div>
-                    <div className="flex flex-wrap gap-2 mt-2">
+
+                    <div className="mb-8">
+                        <div className="flex gap-2">
+                            <input
+                                type="text"
+                                value={taskInput}
+                                onChange={(e) => setTaskInput(e.target.value)}
+                                onKeyDown={handleKeyDown}
+                                placeholder="What needs to get done?"
+                                className="flex-1 bg-gray-900 text-white text-lg px-6 py-4 rounded-lg border-2 border-gray-700 focus:border-blue-500 focus:outline-none"
+                            />
+                            <button
+                                onClick={handleAddTask}
+                                className="px-6 py-4 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg"
+                            >
+                                Add
+                            </button>
+                        </div>
+                        <div className="flex flex-wrap gap-2 mt-2">
+                            <select
+                                value={newPriority}
+                                onChange={(e) => setNewPriority(e.target.value as Priority)}
+                                className="bg-gray-900 text-white text-sm px-3 py-2 rounded-lg border border-gray-700 focus:border-blue-500 focus:outline-none"
+                            >
+                                <option value="high">High</option>
+                                <option value="medium">Medium</option>
+                                <option value="low">Low</option>
+                            </select>
+                            <select
+                                value={newCategory}
+                                onChange={(e) => setNewCategory(e.target.value as Category | '')}
+                                className="bg-gray-900 text-white text-sm px-3 py-2 rounded-lg border border-gray-700 focus:border-blue-500 focus:outline-none"
+                            >
+                                <option value="">No category</option>
+                                {CATEGORIES.map(c => (
+                                    <option key={c} value={c}>{c}</option>
+                                ))}
+                            </select>
+                            <input
+                                type="date"
+                                value={newDueDate}
+                                onChange={(e) => setNewDueDate(e.target.value)}
+                                className="bg-gray-900 text-white text-sm px-3 py-2 rounded-lg border border-gray-700 focus:border-blue-500 focus:outline-none"
+                                placeholder="Due date"
+                            />
+                        </div>
+                    </div>
+
+                    {/* Filters */}
+                    <div className="flex flex-wrap gap-2 mb-6">
+                        <div className="flex gap-1">
+                            {(['all', 'high', 'medium', 'low'] as const).map(p => (
+                                <button
+                                    key={p}
+                                    onClick={() => setFilterPriority(p)}
+                                    className={`px-3 py-1 rounded-full text-xs font-bold transition-colors ${
+                                        filterPriority === p
+                                            ? p === 'high' ? 'bg-red-600 text-white'
+                                                : p === 'medium' ? 'bg-yellow-600 text-white'
+                                                    : p === 'low' ? 'bg-gray-600 text-white'
+                                                        : 'bg-blue-600 text-white'
+                                            : 'bg-gray-800 text-gray-400 hover:text-white'
+                                    }`}
+                                >
+                                    {p === 'all' ? 'All' : p.charAt(0).toUpperCase() + p.slice(1)}
+                                </button>
+                            ))}
+                        </div>
                         <select
-                            value={newPriority}
-                            onChange={(e) => setNewPriority(e.target.value as Priority)}
-                            className="bg-gray-900 text-white text-sm px-3 py-2 rounded-lg border border-gray-700 focus:border-blue-500 focus:outline-none"
+                            value={filterCategory}
+                            onChange={(e) => setFilterCategory(e.target.value as Category | 'all')}
+                            className="bg-gray-800 text-gray-400 text-xs px-3 py-1 rounded-full border-none focus:outline-none"
                         >
-                            <option value="high">High</option>
-                            <option value="medium">Medium</option>
-                            <option value="low">Low</option>
-                        </select>
-                        <select
-                            value={newCategory}
-                            onChange={(e) => setNewCategory(e.target.value as Category | '')}
-                            className="bg-gray-900 text-white text-sm px-3 py-2 rounded-lg border border-gray-700 focus:border-blue-500 focus:outline-none"
-                        >
-                            <option value="">No category</option>
+                            <option value="all">All categories</option>
                             {CATEGORIES.map(c => (
                                 <option key={c} value={c}>{c}</option>
                             ))}
                         </select>
-                        <input
-                            type="date"
-                            value={newDueDate}
-                            onChange={(e) => setNewDueDate(e.target.value)}
-                            className="bg-gray-900 text-white text-sm px-3 py-2 rounded-lg border border-gray-700 focus:border-blue-500 focus:outline-none"
-                            placeholder="Due date"
-                        />
                     </div>
-                </div>
 
-                {/* Filters */}
-                <div className="flex flex-wrap gap-2 mb-6">
-                    <div className="flex gap-1">
-                        {(['all', 'high', 'medium', 'low'] as const).map(p => (
-                            <button
-                                key={p}
-                                onClick={() => setFilterPriority(p)}
-                                className={`px-3 py-1 rounded-full text-xs font-bold transition-colors ${
-                                    filterPriority === p
-                                        ? p === 'high' ? 'bg-red-600 text-white'
-                                            : p === 'medium' ? 'bg-yellow-600 text-white'
-                                            : p === 'low' ? 'bg-gray-600 text-white'
-                                            : 'bg-blue-600 text-white'
-                                        : 'bg-gray-800 text-gray-400 hover:text-white'
-                                }`}
-                            >
-                                {p === 'all' ? 'All' : p.charAt(0).toUpperCase() + p.slice(1)}
-                            </button>
-                        ))}
-                    </div>
-                    <select
-                        value={filterCategory}
-                        onChange={(e) => setFilterCategory(e.target.value as Category | 'all')}
-                        className="bg-gray-800 text-gray-400 text-xs px-3 py-1 rounded-full border-none focus:outline-none"
-                    >
-                        <option value="all">All categories</option>
-                        {CATEGORIES.map(c => (
-                            <option key={c} value={c}>{c}</option>
-                        ))}
-                    </select>
-                </div>
-
-                {/* Celebration Message */}
-                {tasks.length > 0 && activeTasks.length === 0 && (
-                    <div className="mb-8 p-6 bg-green-900/20 border-2 border-green-600 rounded-lg text-center">
-                        <p className="text-2xl font-bold text-green-400">🎉 All tasks complete!</p>
-                        <p className="text-green-300 mt-2">You crushed it today.</p>
-                    </div>
-                )}
-
-                {/* Active Tasks */}
-                {activeTasks.length > 0 && (
-                    <div className="mb-8">
-                        <h2 className="text-xl font-bold mb-4 text-gray-300">Active Tasks</h2>
-                        <div className="space-y-3">
-                            {activeTasks.map((task) => (
-                                <div
-                                    key={task.id}
-                                    className={`bg-gray-900 px-6 py-4 rounded-lg border-2 border-gray-700 flex items-center justify-between ${
-                                        task.priority === 'high' ? 'border-l-4 border-l-red-500'
-                                        : task.priority === 'medium' ? 'border-l-4 border-l-yellow-500'
-                                        : ''
-                                    }`}
-                                >
-                                    <div className="flex-1 min-w-0">
-                                        <div className="flex items-center gap-2 flex-wrap">
-                                            <p className="text-lg break-words line-clamp-2">{task.title}</p>
-                                            {task.category && (
-                                                <span className="text-xs px-2 py-0.5 rounded-full bg-gray-700 text-gray-400">{task.category}</span>
-                                            )}
-                                            {task.due_date && (
-                                                <span className={`text-xs px-2 py-0.5 rounded-full ${
-                                                    isOverdue(task.due_date) ? 'bg-red-900 text-red-300' : 'bg-gray-700 text-gray-400'
-                                                }`}>{formatDueDate(task.due_date)}</span>
-                                            )}
-                                        </div>
-                                    </div>
-                                    <div className="flex gap-2 ml-2 shrink-0">
-                                        <button
-                                            onClick={() => toggleComplete(task.id)}
-                                            className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700"
-                                        >
-                                            Complete
-                                        </button>
-                                        <button
-                                            onClick={() => handleDeleteTask(task.id)}
-                                            className="px-4 py-2 rounded bg-red-900 hover:bg-red-800 text-sm"
-                                        >
-                                            Delete
-                                        </button>
-                                    </div>
-                                </div>
-                            ))}
+                    {/* Celebration Message */}
+                    {tasks.length > 0 && activeTasks.length === 0 && (
+                        <div className="mb-8 p-6 bg-green-900/20 border-2 border-green-600 rounded-lg text-center">
+                            <p className="text-2xl font-bold text-green-400">🎉 All tasks complete!</p>
+                            <p className="text-green-300 mt-2">You crushed it today.</p>
                         </div>
-                    </div>
-                )}
+                    )}
 
-                {/* Completed Tasks (collapsible) */}
-                {completedTasks.length > 0 && (
-                    <div className="mb-8">
-                        <button
-                            onClick={() => setShowCompleted(!showCompleted)}
-                            className="text-gray-400 hover:text-gray-300 text-sm font-bold mb-4"
-                        >
-                            {showCompleted ? 'Hide' : 'Show'} completed ({completedTasks.length})
-                        </button>
-                        {showCompleted && (
-                            <div className="space-y-3 mt-4">
-                                {completedTasks.map((task) => (
+                    {/* Active Tasks */}
+                    {activeTasks.length > 0 && (
+                        <div className="mb-8">
+                            <h2 className="text-xl font-bold mb-4 text-gray-300">Active Tasks</h2>
+                            <div className="space-y-3">
+                                {activeTasks.map((task) => (
                                     <div
                                         key={task.id}
-                                        className="bg-gray-900 px-6 py-4 rounded-lg border-2 border-green-900 flex items-center justify-between opacity-60"
+                                        className={`bg-gray-900 px-6 py-4 rounded-lg border-2 border-gray-700 flex items-center justify-between ${
+                                            task.priority === 'high' ? 'border-l-4 border-l-red-500'
+                                                : task.priority === 'medium' ? 'border-l-4 border-l-yellow-500'
+                                                    : ''
+                                        }`}
                                     >
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-center gap-2 flex-wrap">
-                                                <p className="text-lg line-through text-gray-500 break-words line-clamp-2">{task.title}</p>
+                                                <p
+                                                    className="text-lg break-words line-clamp-2 cursor-pointer hover:text-blue-400 transition-colors"
+                                                    onClick={() => setSelectedTask(task)}
+                                                >
+                                                    {task.title}
+                                                </p>
                                                 {task.category && (
-                                                    <span className="text-xs px-2 py-0.5 rounded-full bg-gray-700 text-gray-500">{task.category}</span>
+                                                    <span className="text-xs px-2 py-0.5 rounded-full bg-gray-700 text-gray-400">{task.category}</span>
                                                 )}
                                                 {task.due_date && (
-                                                    <span className="text-xs px-2 py-0.5 rounded-full bg-gray-700 text-gray-500">{formatDueDate(task.due_date)}</span>
+                                                    <span className={`text-xs px-2 py-0.5 rounded-full ${
+                                                        isOverdue(task.due_date) ? 'bg-red-900 text-red-300' : 'bg-gray-700 text-gray-400'
+                                                    }`}>{formatDueDate(task.due_date)}</span>
                                                 )}
                                             </div>
                                         </div>
                                         <div className="flex gap-2 ml-2 shrink-0">
                                             <button
                                                 onClick={() => toggleComplete(task.id)}
-                                                className="px-4 py-2 rounded bg-green-600 hover:bg-green-700"
+                                                className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700"
                                             >
-                                                ✓ Done
+                                                Complete
                                             </button>
                                             <button
                                                 onClick={() => handleDeleteTask(task.id)}
@@ -440,31 +399,151 @@ export default function Home() {
                                     </div>
                                 ))}
                             </div>
-                        )}
-                    </div>
-                )}
+                        </div>
+                    )}
 
-                {/* Shame Log Toggle */}
-                {deletedTasks.length > 0 && (
-                    <div className="mt-6">
-                        <button
-                            onClick={() => setShowShameLog(!showShameLog)}
-                            className="text-gray-500 text-sm hover:text-gray-400"
-                        >
-                            {showShameLog ? 'Hide' : 'Show'} Shame Log ({deletedTasks.length})
-                        </button>
-                        {showShameLog && (
-                            <div className="mt-3 p-4 bg-red-900/20 border-2 border-red-900 rounded-lg">
-                                <p className="text-red-400 font-bold mb-2">Tasks you gave up on:</p>
-                                {deletedTasks.map((task, index) => (
-                                    <p key={index} className="text-red-300 text-sm">• {task}</p>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                )}
+                    {/* Completed Tasks (collapsible) */}
+                    {completedTasks.length > 0 && (
+                        <div className="mb-8">
+                            <button
+                                onClick={() => setShowCompleted(!showCompleted)}
+                                className="text-gray-400 hover:text-gray-300 text-sm font-bold mb-4"
+                            >
+                                {showCompleted ? 'Hide' : 'Show'} completed ({completedTasks.length})
+                            </button>
+                            {showCompleted && (
+                                <div className="space-y-3 mt-4">
+                                    {completedTasks.map((task) => (
+                                        <div
+                                            key={task.id}
+                                            className="bg-gray-900 px-6 py-4 rounded-lg border-2 border-green-900 flex items-center justify-between opacity-60"
+                                        >
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex items-center gap-2 flex-wrap">
+                                                    <p
+                                                        className="text-lg line-through text-gray-500 break-words line-clamp-2 cursor-pointer hover:text-gray-400 transition-colors"
+                                                        onClick={() => setSelectedTask(task)}
+                                                    >
+                                                        {task.title}
+                                                    </p>
+                                                    {task.category && (
+                                                        <span className="text-xs px-2 py-0.5 rounded-full bg-gray-700 text-gray-500">{task.category}</span>
+                                                    )}
+                                                    {task.due_date && (
+                                                        <span className="text-xs px-2 py-0.5 rounded-full bg-gray-700 text-gray-500">{formatDueDate(task.due_date)}</span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            <div className="flex gap-2 ml-2 shrink-0">
+                                                <button
+                                                    onClick={() => toggleComplete(task.id)}
+                                                    className="px-4 py-2 rounded bg-green-600 hover:bg-green-700"
+                                                >
+                                                    ✓ Done
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDeleteTask(task.id)}
+                                                    className="px-4 py-2 rounded bg-red-900 hover:bg-red-800 text-sm"
+                                                >
+                                                    Delete
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {/* Shame Log Toggle */}
+                    {deletedTasks.length > 0 && (
+                        <div className="mt-6">
+                            <button
+                                onClick={() => setShowShameLog(!showShameLog)}
+                                className="text-gray-500 text-sm hover:text-gray-400"
+                            >
+                                {showShameLog ? 'Hide' : 'Show'} Shame Log ({deletedTasks.length})
+                            </button>
+                            {showShameLog && (
+                                <div className="mt-3 p-4 bg-red-900/20 border-2 border-red-900 rounded-lg">
+                                    <p className="text-red-400 font-bold mb-2">Tasks you gave up on:</p>
+                                    {deletedTasks.map((task, index) => (
+                                        <p key={index} className="text-red-300 text-sm">• {task}</p>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </>}
             </div>
+
+            {/* Task Detail Modal */}
+            {selectedTask && (
+                <div
+                    className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50"
+                    onClick={() => setSelectedTask(null)}
+                >
+                    <div
+                        className="bg-gray-900 rounded-lg border-2 border-gray-700 max-w-lg w-full max-h-[80vh] overflow-y-auto"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="p-6">
+                            <div className="flex items-start justify-between gap-4 mb-4">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                    {selectedTask.priority === 'high' && (
+                                        <span className="text-xs px-2 py-0.5 rounded-full bg-red-600 text-white">High</span>
+                                    )}
+                                    {selectedTask.priority === 'medium' && (
+                                        <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-600 text-white">Medium</span>
+                                    )}
+                                    {selectedTask.category && (
+                                        <span className="text-xs px-2 py-0.5 rounded-full bg-gray-700 text-gray-400">{selectedTask.category}</span>
+                                    )}
+                                    {selectedTask.due_date && (
+                                        <span className={`text-xs px-2 py-0.5 rounded-full ${
+                                            selectedTask.due_date < todayStr ? 'bg-red-900 text-red-300' : 'bg-gray-700 text-gray-400'
+                                        }`}>{formatDueDate(selectedTask.due_date)}</span>
+                                    )}
+                                </div>
+                                <button
+                                    onClick={() => setSelectedTask(null)}
+                                    className="text-gray-500 hover:text-white text-2xl leading-none"
+                                >
+                                    ×
+                                </button>
+                            </div>
+
+                            <p className="text-xl text-white leading-relaxed mb-6">{selectedTask.title}</p>
+
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => {
+                                        toggleComplete(selectedTask.id);
+                                        setSelectedTask(null);
+                                    }}
+                                    className={`flex-1 px-4 py-3 rounded font-bold ${
+                                        selectedTask.completed
+                                            ? 'bg-green-600 hover:bg-green-700'
+                                            : 'bg-blue-600 hover:bg-blue-700'
+                                    }`}
+                                >
+                                    {selectedTask.completed ? '✓ Done' : 'Complete'}
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        handleDeleteTask(selectedTask.id);
+                                        setSelectedTask(null);
+                                    }}
+                                    className="px-4 py-3 rounded bg-red-900 hover:bg-red-800"
+                                >
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {showCelebration && (
                 <Celebration
                     milestone={milestone}
@@ -472,5 +551,5 @@ export default function Home() {
                 />
             )}
         </div>
-);
+    );
 }
