@@ -13,12 +13,13 @@ import {
 } from '@/actions/tasks';
 import { CATEGORIES } from '@/lib/constants';
 import { getTodaySkipDay } from '@/actions/skip-days';
+import BuyTab from "./components/BuyTab";
 import Link from 'next/link';
 import Celebration from "./components/Celebration";
 import StakesTab from "./components/StakesTab";
 import HabitsTab from "./components/HabitsTab";
 
-type Tab = 'tasks' | 'stakes' | 'habits';
+type Tab = 'tasks' | 'buy' | 'stakes' | 'habits';
 
 export default function Home() {
     const [activeTab, setActiveTab] = useState<Tab>('tasks');
@@ -220,6 +221,16 @@ export default function Home() {
                         Tasks
                     </button>
                     <button
+                        onClick={() => setActiveTab('buy')}
+                        className={`flex-1 px-4 py-2 rounded-md text-sm font-bold transition-colors ${
+                            activeTab === 'buy'
+                                ? 'bg-orange-600 text-white'
+                                : 'text-gray-400 hover:text-white'
+                        }`}
+                    >
+                        Buy
+                    </button>
+                    <button
                         onClick={() => setActiveTab('stakes')}
                         className={`flex-1 px-4 py-2 rounded-md text-sm font-bold transition-colors ${
                             activeTab === 'stakes'
@@ -241,6 +252,7 @@ export default function Home() {
                     </button>
                 </div>
 
+                {activeTab === 'buy' && <BuyTab />}
                 {activeTab === 'stakes' && <StakesTab />}
                 {activeTab === 'habits' && <HabitsTab />}
 
