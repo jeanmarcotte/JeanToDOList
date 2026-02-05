@@ -13,13 +13,17 @@ import {
 } from '@/actions/tasks';
 import { CATEGORIES } from '@/lib/constants';
 import { getTodaySkipDay } from '@/actions/skip-days';
+import { getActivePriorityCount } from '@/actions/priorities';
+import { getActiveGoalCount } from '@/actions/goals';
 import BuyTab from "./components/BuyTab";
 import Link from 'next/link';
 import Celebration from "./components/Celebration";
 import StakesTab from "./components/StakesTab";
 import HabitsTab from "./components/HabitsTab";
+import PrioritiesTab from "./components/PrioritiesTab";
+import GoalsTab from "./components/GoalsTab";
 
-type Tab = 'tasks' | 'buy' | 'stakes' | 'habits';
+type Tab = 'tasks' | 'buy' | 'stakes' | 'habits' | 'priorities' | 'goals';
 
 export default function Home() {
     const [activeTab, setActiveTab] = useState<Tab>('tasks');
@@ -39,13 +43,32 @@ export default function Home() {
     const [skipDayReason, setSkipDayReason] = useState<string | null>(null);
     const [torontoTime, setTorontoTime] = useState('');
     const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+    const [priorityCount, setPriorityCount] = useState(0);
+    const [goalCount, setGoalCount] = useState(0);
 
     useEffect(() => {
         loadTasks();
         getTodaySkipDay().then(({ data }) => {
             if (data) setSkipDayReason(data.reason);
         });
+        loadBadgeCounts();
     }, []);
+
+    // Refresh badge counts when switching away from priorities/goals tabs
+    useEffect(() => {
+        if (activeTab !== 'priorities' && activeTab !== 'goals') {
+            loadBadgeCounts();
+        }
+    }, [activeTab]);
+
+    const loadBadgeCounts = async () => {
+        const [priResult, goalResult] = await Promise.all([
+            getActivePriorityCount(),
+            getActiveGoalCount(),
+        ]);
+        setPriorityCount(priResult.count);
+        setGoalCount(goalResult.count);
+    };
 
     // Live clock in Toronto timezone
     useEffect(() => {
@@ -201,12 +224,75 @@ export default function Home() {
                         </svg>
                     </Link>
                 </div>
-                <p className="text-lg text-gray-400 mb-6 text-center">
+                {/* Toronto time — hidden on mobile */}
+                <p className="hidden sm:block text-lg text-gray-400 mb-6 text-center">
                     {torontoTime ? `${torontoTime} Toronto Time` : '\u00A0'}
                     {skipDayReason === 'Wedding' && (
                         <span className="ml-2 text-yellow-300 font-bold">Wedding Day!</span>
                     )}
                 </p>
+                {/* Wedding Day indicator still shows on mobile */}
+                {skipDayReason === 'Wedding' && (
+                    <p className="sm:hidden text-center text-yellow-300 font-bold mb-4">🎊 Wedding Day!</p>
+                )}
+
+                {/* Priorities & Goals Row */}
+                <div className="flex justify-center gap-2 mb-2 max-w-sm mx-auto">
+                    <button
+                        onClick={() => setActiveTab('priorities')}
+                        className={`flex-1 px-4 py-2 rounded-md text-sm font-bold transition-colors relative ${
+                            activeTab === 'priorities'
+                                ? 'bg-red-600 text-white'
+                                : 'bg-gray-800 text-gray-400 hover:text-white'
+                        }`}
+                    >
+                        Priorities
+                        {priorityCount > 0 && (
+                            <span className={`ml-1.5 inline-flex items-center justify-center w-5 h-5 text-xs rounded-full ${
+                                activeTab === 'priorities' ? 'bg-red-800 text-red-200' : 'bg-gray-700 text-gray-300'
+                            }`}>
+                                {priorityCount}
+                            </span>
+                        )}
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('goals')}
+                        className={`flex-1 px-4 py-2 rounded-md text-sm font-bold transition-colors ${
+                            activeTab === 'goals'
+                                ? 'bg-teal-600 text-white'
+                                : 'bg-gray-800 text-gray-400 hover:text-white'
+                        }`}
+                    >
+                        Goals
+                        {goalCount > 0 && (
+                            <span className={`ml-1.5 inline-flex items-center justify-center w-5 h-5 text-xs rounded-full ${
+                                activeTab === 'goals' ? 'bg-teal-800 text-teal-200' : 'bg-gray-700 text-gray-300'
+                            }`}>
+                                {goalCount}
+                            </span>
+                        )}
+                    </button>
+                </div>
+
+                {/* Active / Complete Stats Row (only for tasks view) */}
+                {(activeTab === 'tasks') && (
+                    <div className="flex justify-center gap-6 mb-2 text-sm">
+                        <div className="text-center">
+                            <div className="text-2xl font-bold text-blue-500">{activeTasks.length}</div>
+                            <div className="text-gray-500">Active</div>
+                        </div>
+                        <div className="text-center">
+                            <div className="text-2xl font-bold text-green-500">{completedTasks.length}</div>
+                            <div className="text-gray-500">Completed</div>
+                        </div>
+                        {deletedTasks.length > 0 && (
+                            <div className="text-center">
+                                <div className="text-2xl font-bold text-red-500">{deletedTasks.length}</div>
+                                <div className="text-gray-500">Deleted</div>
+                            </div>
+                        )}
+                    </div>
+                )}
 
                 {/* Tab Bar */}
                 <div className="flex justify-center gap-1 mb-8 bg-gray-900 rounded-lg p-1 max-w-sm mx-auto">
@@ -255,26 +341,10 @@ export default function Home() {
                 {activeTab === 'buy' && <BuyTab />}
                 {activeTab === 'stakes' && <StakesTab />}
                 {activeTab === 'habits' && <HabitsTab />}
+                {activeTab === 'priorities' && <PrioritiesTab />}
+                {activeTab === 'goals' && <GoalsTab />}
 
                 {activeTab === 'tasks' && <>
-                    {/* Stats */}
-                    <div className="flex justify-center gap-6 mb-8 text-sm">
-                        <div className="text-center">
-                            <div className="text-2xl font-bold text-blue-500">{activeTasks.length}</div>
-                            <div className="text-gray-500">Active</div>
-                        </div>
-                        <div className="text-center">
-                            <div className="text-2xl font-bold text-green-500">{completedTasks.length}</div>
-                            <div className="text-gray-500">Completed</div>
-                        </div>
-                        {deletedTasks.length > 0 && (
-                            <div className="text-center">
-                                <div className="text-2xl font-bold text-red-500">{deletedTasks.length}</div>
-                                <div className="text-gray-500">Deleted</div>
-                            </div>
-                        )}
-                    </div>
-
                     <div className="mb-8">
                         <div className="flex gap-2">
                             <input
