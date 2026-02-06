@@ -2,10 +2,12 @@
 
 import { createClient } from "@supabase/supabase-js";
 
-const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+
+function getSupabaseAdmin() {
+    return createClient(supabaseUrl, supabaseServiceKey);
+}
 
 export interface Priority {
     id: number;
@@ -17,6 +19,7 @@ export interface Priority {
 }
 
 export async function getPriorities() {
+    const supabase = getSupabaseAdmin();
     const { data, error } = await supabase
         .from("priorities")
         .select("*")
@@ -26,9 +29,8 @@ export async function getPriorities() {
 }
 
 export async function addPriority(title: string) {
-    // Shift all existing items down by 1 to make room at top
+    const supabase = getSupabaseAdmin();
     await supabase.rpc('increment_priority_sort_orders');
-
     const { data, error } = await supabase
         .from("priorities")
         .insert([{ title, sort_order: 0, status: 'active' }])
@@ -38,6 +40,7 @@ export async function addPriority(title: string) {
 }
 
 export async function completePriority(id: number) {
+    const supabase = getSupabaseAdmin();
     const { error } = await supabase
         .from("priorities")
         .update({ status: 'completed', completed_at: new Date().toISOString() })
@@ -46,6 +49,7 @@ export async function completePriority(id: number) {
 }
 
 export async function dismissPriority(id: number) {
+    const supabase = getSupabaseAdmin();
     const { error } = await supabase
         .from("priorities")
         .update({ status: 'dismissed', completed_at: new Date().toISOString() })
@@ -54,6 +58,7 @@ export async function dismissPriority(id: number) {
 }
 
 export async function reorderPriorities(orderedIds: number[]) {
+    const supabase = getSupabaseAdmin();
     const updates = orderedIds.map((id, index) =>
         supabase
             .from("priorities")
@@ -66,15 +71,14 @@ export async function reorderPriorities(orderedIds: number[]) {
 }
 
 export async function moveToBottom(id: number) {
+    const supabase = getSupabaseAdmin();
     const { data: existing } = await supabase
         .from("priorities")
         .select("sort_order")
         .eq("status", "active")
         .order("sort_order", { ascending: false })
         .limit(1);
-
     const maxOrder = existing && existing.length > 0 ? existing[0].sort_order : 0;
-
     const { error } = await supabase
         .from("priorities")
         .update({ sort_order: maxOrder + 1 })
@@ -83,6 +87,7 @@ export async function moveToBottom(id: number) {
 }
 
 export async function getActivePriorityCount() {
+    const supabase = getSupabaseAdmin();
     const { count, error } = await supabase
         .from("priorities")
         .select("*", { count: 'exact', head: true })

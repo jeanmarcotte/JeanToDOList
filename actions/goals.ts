@@ -2,10 +2,12 @@
 
 import { createClient } from "@supabase/supabase-js";
 
-const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+
+function getSupabaseAdmin() {
+    return createClient(supabaseUrl, supabaseServiceKey);
+}
 
 export interface Goal {
     id: number;
@@ -17,6 +19,7 @@ export interface Goal {
 }
 
 export async function getGoals() {
+    const supabase = getSupabaseAdmin();
     const { data, error } = await supabase
         .from("goals")
         .select("*")
@@ -26,6 +29,7 @@ export async function getGoals() {
 }
 
 export async function addGoal(title: string, targetDate: string) {
+    const supabase = getSupabaseAdmin();
     const { data, error } = await supabase
         .from("goals")
         .insert([{ title, target_date: targetDate, status: 'active' }])
@@ -35,6 +39,7 @@ export async function addGoal(title: string, targetDate: string) {
 }
 
 export async function completeGoal(id: number) {
+    const supabase = getSupabaseAdmin();
     const { error } = await supabase
         .from("goals")
         .update({ status: 'completed', completed_at: new Date().toISOString() })
@@ -43,6 +48,7 @@ export async function completeGoal(id: number) {
 }
 
 export async function deleteGoal(id: number) {
+    const supabase = getSupabaseAdmin();
     const { error } = await supabase
         .from("goals")
         .delete()
@@ -51,6 +57,7 @@ export async function deleteGoal(id: number) {
 }
 
 export async function getActiveGoalCount() {
+    const supabase = getSupabaseAdmin();
     const { count, error } = await supabase
         .from("goals")
         .select("*", { count: 'exact', head: true })
