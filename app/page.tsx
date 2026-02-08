@@ -7,6 +7,7 @@ import {
     Category,
     getTasks,
     createTask,
+    updateTask,
     updateTaskCompletion,
     deleteTask,
     getCompletedCount,
@@ -43,6 +44,11 @@ export default function Home() {
     const [skipDayReason, setSkipDayReason] = useState<string | null>(null);
     const [torontoTime, setTorontoTime] = useState('');
     const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editTitle, setEditTitle] = useState('');
+    const [editPriority, setEditPriority] = useState<Priority>('medium');
+    const [editCategory, setEditCategory] = useState<Category | ''>('');
+    const [editDueDate, setEditDueDate] = useState('');
     const [priorityCount, setPriorityCount] = useState(0);
     const [goalCount, setGoalCount] = useState(0);
 
@@ -564,7 +570,7 @@ export default function Home() {
             {selectedTask && (
                 <div
                     className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50"
-                    onClick={() => setSelectedTask(null)}
+                    onClick={() => { setSelectedTask(null); setIsEditing(false); }}
                 >
                     <div
                         className="bg-gray-900 rounded-lg border-2 border-gray-700 max-w-lg w-full max-h-[80vh] overflow-y-auto"
@@ -573,55 +579,140 @@ export default function Home() {
                         <div className="p-6">
                             <div className="flex items-start justify-between gap-4 mb-4">
                                 <div className="flex items-center gap-2 flex-wrap">
-                                    {selectedTask.priority === 'high' && (
-                                        <span className="text-xs px-2 py-0.5 rounded-full bg-red-600 text-white">High</span>
-                                    )}
-                                    {selectedTask.priority === 'medium' && (
-                                        <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-600 text-white">Medium</span>
-                                    )}
-                                    {selectedTask.category && (
-                                        <span className="text-xs px-2 py-0.5 rounded-full bg-gray-700 text-gray-400">{selectedTask.category}</span>
-                                    )}
-                                    {selectedTask.due_date && (
-                                        <span className={`text-xs px-2 py-0.5 rounded-full ${
-                                            selectedTask.due_date < todayStr ? 'bg-red-900 text-red-300' : 'bg-gray-700 text-gray-400'
-                                        }`}>{formatDueDate(selectedTask.due_date)}</span>
+                                    {!isEditing && (
+                                        <>
+                                            {selectedTask.priority === 'high' && (
+                                                <span className="text-xs px-2 py-0.5 rounded-full bg-red-600 text-white">High</span>
+                                            )}
+                                            {selectedTask.priority === 'medium' && (
+                                                <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-600 text-white">Medium</span>
+                                            )}
+                                            {selectedTask.category && (
+                                                <span className="text-xs px-2 py-0.5 rounded-full bg-gray-700 text-gray-400">{selectedTask.category}</span>
+                                            )}
+                                            {selectedTask.due_date && (
+                                                <span className={`text-xs px-2 py-0.5 rounded-full ${
+                                                    selectedTask.due_date < todayStr ? 'bg-red-900 text-red-300' : 'bg-gray-700 text-gray-400'
+                                                }`}>{formatDueDate(selectedTask.due_date)}</span>
+                                            )}
+                                        </>
                                     )}
                                 </div>
                                 <button
-                                    onClick={() => setSelectedTask(null)}
+                                    onClick={() => { setSelectedTask(null); setIsEditing(false); }}
                                     className="text-gray-500 hover:text-white text-2xl leading-none"
                                 >
                                     ×
                                 </button>
                             </div>
 
-                            <p className="text-xl text-white leading-relaxed mb-6">{selectedTask.title}</p>
+                            {isEditing ? (
+                                <>
+                                    <textarea
+                                        value={editTitle}
+                                        onChange={(e) => setEditTitle(e.target.value)}
+                                        className="w-full bg-gray-800 text-white text-lg px-4 py-3 rounded-lg border-2 border-blue-500 focus:outline-none mb-4 resize-none"
+                                        rows={3}
+                                        autoFocus
+                                    />
+                                    <div className="flex flex-wrap gap-2 mb-6">
+                                        <select
+                                            value={editPriority}
+                                            onChange={(e) => setEditPriority(e.target.value as Priority)}
+                                            className="bg-gray-800 text-white text-sm px-3 py-2 rounded-lg border border-gray-700 focus:border-blue-500 focus:outline-none"
+                                        >
+                                            <option value="high">High</option>
+                                            <option value="medium">Medium</option>
+                                            <option value="low">Low</option>
+                                        </select>
+                                        <select
+                                            value={editCategory}
+                                            onChange={(e) => setEditCategory(e.target.value as Category | '')}
+                                            className="bg-gray-800 text-white text-sm px-3 py-2 rounded-lg border border-gray-700 focus:border-blue-500 focus:outline-none"
+                                        >
+                                            <option value="">No category</option>
+                                            {CATEGORIES.map(c => (
+                                                <option key={c} value={c}>{c}</option>
+                                            ))}
+                                        </select>
+                                        <input
+                                            type="date"
+                                            value={editDueDate}
+                                            onChange={(e) => setEditDueDate(e.target.value)}
+                                            className="bg-gray-800 text-white text-sm px-3 py-2 rounded-lg border border-gray-700 focus:border-blue-500 focus:outline-none"
+                                            style={{ colorScheme: 'dark' }}
+                                        />
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <button
+                                            onClick={async () => {
+                                                if (!editTitle.trim()) return;
+                                                const { data, error } = await updateTask(selectedTask.id, {
+                                                    title: editTitle.trim(),
+                                                    priority: editPriority,
+                                                    category: editCategory || null,
+                                                    due_date: editDueDate || null,
+                                                });
+                                                if (!error && data) {
+                                                    setTasks(tasks.map(t => t.id === data.id ? data : t));
+                                                    setSelectedTask(data);
+                                                    setIsEditing(false);
+                                                }
+                                            }}
+                                            className="flex-1 px-4 py-3 rounded font-bold bg-blue-600 hover:bg-blue-700"
+                                        >
+                                            Save
+                                        </button>
+                                        <button
+                                            onClick={() => setIsEditing(false)}
+                                            className="px-4 py-3 rounded bg-gray-700 hover:bg-gray-600"
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </>
+                            ) : (
+                                <>
+                                    <p className="text-xl text-white leading-relaxed mb-6">{selectedTask.title}</p>
 
-                            <div className="flex gap-2">
-                                <button
-                                    onClick={() => {
-                                        toggleComplete(selectedTask.id);
-                                        setSelectedTask(null);
-                                    }}
-                                    className={`flex-1 px-4 py-3 rounded font-bold ${
-                                        selectedTask.completed
-                                            ? 'bg-green-600 hover:bg-green-700'
-                                            : 'bg-blue-600 hover:bg-blue-700'
-                                    }`}
-                                >
-                                    {selectedTask.completed ? '✓ Done' : 'Complete'}
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        handleDeleteTask(selectedTask.id);
-                                        setSelectedTask(null);
-                                    }}
-                                    className="px-4 py-3 rounded bg-red-900 hover:bg-red-800"
-                                >
-                                    Delete
-                                </button>
-                            </div>
+                                    <div className="flex gap-2">
+                                        <button
+                                            onClick={() => {
+                                                setEditTitle(selectedTask.title);
+                                                setEditPriority(selectedTask.priority);
+                                                setEditCategory(selectedTask.category || '');
+                                                setEditDueDate(selectedTask.due_date || '');
+                                                setIsEditing(true);
+                                            }}
+                                            className="flex-1 px-4 py-3 rounded font-bold bg-yellow-600 hover:bg-yellow-700"
+                                        >
+                                            ✏️ Edit
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                toggleComplete(selectedTask.id);
+                                                setSelectedTask(null);
+                                            }}
+                                            className={`flex-1 px-4 py-3 rounded font-bold ${
+                                                selectedTask.completed
+                                                    ? 'bg-green-600 hover:bg-green-700'
+                                                    : 'bg-blue-600 hover:bg-blue-700'
+                                            }`}
+                                        >
+                                            {selectedTask.completed ? '✓ Done' : 'Complete'}
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                handleDeleteTask(selectedTask.id);
+                                                setSelectedTask(null);
+                                            }}
+                                            className="px-4 py-3 rounded bg-red-900 hover:bg-red-800"
+                                        >
+                                            Delete
+                                        </button>
+                                    </div>
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>

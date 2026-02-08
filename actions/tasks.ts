@@ -25,7 +25,6 @@ export interface Task {
 export async function getTasks(): Promise<{ data: Task[] | null; error: string | null }> {
   const supabase = getSupabaseAdmin();
 
-  // Custom ordering: high first, then medium, then low, then by created_at desc
   const { data, error } = await supabase
     .from("tasks")
     .select("*")
@@ -49,6 +48,31 @@ export async function createTask(
   const { data, error } = await supabase
     .from("tasks")
     .insert([{ title, completed: false, priority, category, due_date }])
+    .select()
+    .single();
+
+  if (error) {
+    return { data: null, error: error.message };
+  }
+
+  return { data, error: null };
+}
+
+export async function updateTask(
+  id: number,
+  updates: {
+    title?: string;
+    priority?: Priority;
+    category?: Category | null;
+    due_date?: string | null;
+  }
+): Promise<{ data: Task | null; error: string | null }> {
+  const supabase = getSupabaseAdmin();
+
+  const { data, error } = await supabase
+    .from("tasks")
+    .update(updates)
+    .eq("id", id)
     .select()
     .single();
 
