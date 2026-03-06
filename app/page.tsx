@@ -16,8 +16,11 @@ import { CATEGORIES } from '@/lib/constants';
 import { getTodaySkipDay } from '@/actions/skip-days';
 import { getActivePriorityCount } from '@/actions/priorities';
 import { getActiveGoalCount } from '@/actions/goals';
+import { getAllPrintData, PrintData } from '@/actions/print-data';
 import BuyTab from "./components/BuyTab";
+import PrintView from "./components/PrintView";
 import Link from 'next/link';
+import { Printer } from 'lucide-react';
 import Celebration from "./components/Celebration";
 import StakesTab from "./components/StakesTab";
 import HabitsTab from "./components/HabitsTab";
@@ -51,6 +54,7 @@ export default function Home() {
     const [editDueDate, setEditDueDate] = useState('');
     const [priorityCount, setPriorityCount] = useState(0);
     const [goalCount, setGoalCount] = useState(0);
+    const [printData, setPrintData] = useState<PrintData | null>(null);
 
     useEffect(() => {
         loadTasks();
@@ -74,6 +78,15 @@ export default function Home() {
         ]);
         setPriorityCount(priResult.count);
         setGoalCount(goalResult.count);
+    };
+
+    const handlePrint = async () => {
+        const { data } = await getAllPrintData();
+        if (data) {
+            setPrintData(data);
+            // Wait for React to render the print view
+            setTimeout(() => window.print(), 100);
+        }
     };
 
     // Live clock in Toronto timezone
@@ -223,6 +236,13 @@ export default function Home() {
             <div className="max-w-2xl mx-auto py-8">
                 <div className="flex items-center justify-center gap-3 mb-4">
                     <h1 className="text-6xl font-bold text-center">JeanToDoList</h1>
+                    <button
+                        onClick={handlePrint}
+                        className="text-gray-500 hover:text-white transition-colors"
+                        title="Print Master List"
+                    >
+                        <Printer size={24} />
+                    </button>
                     <Link href="/settings" className="text-gray-500 hover:text-white transition-colors" title="Settings">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
@@ -722,6 +742,18 @@ export default function Home() {
                 <Celebration
                     milestone={milestone}
                     onClose={() => setShowCelebration(false)}
+                />
+            )}
+
+            {printData && (
+                <PrintView
+                    data={printData}
+                    dateStr={new Date().toLocaleDateString('en-US', {
+                        timeZone: 'America/Toronto',
+                        month: 'long',
+                        day: 'numeric',
+                        year: 'numeric',
+                    })}
                 />
             )}
         </div>
