@@ -84,8 +84,13 @@ export default function Home() {
         const { data } = await getAllPrintData();
         if (data) {
             setPrintData(data);
-            // Wait for React to render the print view
-            setTimeout(() => window.print(), 100);
+            const dateStr = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Toronto' });
+            const originalTitle = document.title;
+            document.title = `Jeans Master List — ${dateStr}`;
+            setTimeout(() => {
+                window.print();
+                document.title = originalTitle;
+            }, 100);
         }
     };
 
