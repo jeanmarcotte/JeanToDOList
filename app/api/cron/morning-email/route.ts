@@ -114,7 +114,34 @@ export async function GET(request: NextRequest) {
         }).join("")}</ul>`
       : '<p style="color:#22c55e;">All tasks completed! Nothing pending.</p>';
 
-  // TODO: Add WHOOP health data section here (separate Supabase project: oabfbugszpnjpquhjssv)
+  // Fetch WHOOP health data from separate Supabase project
+  let healthHtml = "";
+  if (process.env.WHOOP_SUPABASE_URL && process.env.WHOOP_SUPABASE_KEY) {
+    const whoopSupabase = createClient(
+      process.env.WHOOP_SUPABASE_URL!,
+      process.env.WHOOP_SUPABASE_KEY!
+    );
+    const { data: whoop } = await whoopSupabase
+      .from("whoop_daily_metrics")
+      .select("recovery_score, hrv, resting_hr, day_strain, sleep_duration_min, sleep_performance")
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (whoop) {
+      const sleepHrs = Math.floor((whoop.sleep_duration_min || 0) / 60);
+      const sleepMin = Math.round((whoop.sleep_duration_min || 0) % 60);
+      const recoveryColor = (whoop.recovery_score ?? 0) >= 67 ? "#22c55e" : (whoop.recovery_score ?? 0) >= 34 ? "#eab308" : "#ef4444";
+      healthHtml = `
+        <h2 style="font-size:18px;border-bottom:1px solid #333;padding-bottom:8px;margin-top:24px;">🏥 Health (WHOOP)</h2>
+        <div style="font-family:monospace;font-size:14px;line-height:1.8;padding:12px;background:#1a1a1a;border-radius:6px;">
+          <div>Sleep: <strong>${sleepHrs}h ${sleepMin}m</strong> (${whoop.sleep_performance ?? "—"}% performance)</div>
+          <div>Recovery: <strong style="color:${recoveryColor};">${whoop.recovery_score ?? "—"}%</strong></div>
+          <div>HRV: <strong>${whoop.hrv ?? "—"}ms</strong> | RHR: <strong>${whoop.resting_hr ?? "—"}bpm</strong></div>
+          <div>Strain: <strong>${whoop.day_strain ?? "—"}</strong></div>
+        </div>`;
+    }
+  }
 
   const html = `
     <div style="font-family:system-ui,sans-serif;max-width:600px;margin:0 auto;background:#111;color:#e5e5e5;padding:24px;border-radius:8px;">
@@ -123,7 +150,9 @@ export async function GET(request: NextRequest) {
 
       ${skipDay ? `<div style="background:#854d0e;color:#fef3c7;padding:12px;border-radius:6px;margin-bottom:24px;">Skip Day: ${skipDay.reason}</div>` : ""}
 
-      <h2 style="font-size:18px;border-bottom:1px solid #333;padding-bottom:8px;">Pending Tasks (${tasks?.length || 0})</h2>
+      ${healthHtml}
+
+      <h2 style="font-size:18px;border-bottom:1px solid #333;padding-bottom:8px;${healthHtml ? "margin-top:24px;" : ""}">Pending Tasks (${tasks?.length || 0})</h2>
       ${tasksHtml}
 
       <h2 style="font-size:18px;border-bottom:1px solid #333;padding-bottom:8px;margin-top:24px;">Today's Habits</h2>
