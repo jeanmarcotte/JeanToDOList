@@ -11,11 +11,8 @@ export default function HabitsTab() {
     const [streakToast, setStreakToast] = useState<{ habitLabel: string; days: number } | null>(null);
     const [celebration, setCelebration] = useState<{ milestone: number; legendary: boolean } | null>(null);
 
-    useEffect(() => {
-        loadHabits();
-    }, []);
+    useEffect(() => { loadHabits(); }, []);
 
-    // Auto-dismiss streak toast after 3s
     useEffect(() => {
         if (streakToast) {
             const timer = setTimeout(() => setStreakToast(null), 3000);
@@ -40,11 +37,7 @@ export default function HabitsTab() {
         try {
             const { completed, milestone, error } = await toggleHabit(habitKey);
             if (error) throw new Error(error);
-
-            setHabits(habits.map(h =>
-                h.habit.habit_key === habitKey ? { ...h, completed } : h
-            ));
-
+            setHabits(habits.map(h => h.habit.habit_key === habitKey ? { ...h, completed } : h));
             if (milestone) {
                 const habit = habits.find(h => h.habit.habit_key === habitKey);
                 if (milestone === 7) {
@@ -60,62 +53,47 @@ export default function HabitsTab() {
         }
     };
 
-    // Only show applicable habits (correct day of week)
     const visibleHabits = habits.filter(h => h.applicable);
     const completedCount = visibleHabits.filter(h => h.completed || h.skipped).length;
     const totalCount = visibleHabits.length;
     const allDone = totalCount > 0 && completedCount === totalCount;
 
-    if (loading) {
-        return <p className="text-center text-gray-400">Loading habits...</p>;
-    }
-
-    if (visibleHabits.length === 0) {
-        return <p className="text-center text-gray-400">No habits scheduled for today.</p>;
-    }
+    if (loading) return <p className="text-center text-gray-400">Loading habits...</p>;
+    if (visibleHabits.length === 0) return <p className="text-center text-gray-400">No habits scheduled for today.</p>;
 
     return (
         <div>
-            {/* Streak toast */}
             {streakToast && (
-                <div className="fixed top-4 left-1/2 -translate-x-1/2 z-40 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg animate-bounce">
+                <div className="fixed top-4 left-1/2 -translate-x-1/2 z-40 bg-green-800 text-green-100 px-6 py-3 rounded-lg shadow-lg animate-bounce">
                     🔥 {streakToast.days}-day streak on &quot;{streakToast.habitLabel}&quot;!
                 </div>
             )}
 
-            {/* Big celebration */}
             {celebration && (
                 <Celebration
                     milestone={celebration.milestone}
                     onClose={() => setCelebration(null)}
                     title="STREAK!"
                     subtitle={`${celebration.milestone} Days!`}
-                    message={celebration.legendary
-                        ? `LEGENDARY! ${celebration.milestone} days in a row! You are unstoppable!`
-                        : `${celebration.milestone} days straight! Amazing consistency!`}
+                    message={celebration.legendary ? `LEGENDARY! ${celebration.milestone} days in a row! You are unstoppable!` : `${celebration.milestone} days straight! Amazing consistency!`}
                     emoji={celebration.legendary ? "👑🔥👑" : "🔥🎉🔥"}
                     buttonText="Keep the streak alive!"
                 />
             )}
 
-            {/* Header */}
             <div className="flex items-center justify-center mb-6">
                 <div className="text-center">
-                    <span className="text-3xl font-bold text-green-600">
-                        {completedCount} / {totalCount}
-                    </span>
-                    <p className="text-gray-400 text-sm mt-1">habits completed today</p>
+                    <span className="text-3xl font-bold text-green-400">{completedCount} / {totalCount}</span>
+                    <p className="text-gray-500 text-sm mt-1">habits completed today</p>
                 </div>
             </div>
 
-            {/* All done banner */}
             {allDone && (
-                <div className="mb-6 p-4 bg-green-50 border-2 border-green-500 rounded-lg text-center">
-                    <p className="text-xl font-bold text-green-600">All habits done for today!</p>
+                <div className="mb-6 p-4 bg-green-900/20 border-2 border-green-600 rounded-lg text-center">
+                    <p className="text-xl font-bold text-green-400">All habits done for today!</p>
                 </div>
             )}
 
-            {/* Habit list */}
             <div className="space-y-3">
                 {visibleHabits.map(({ habit, completed, skipped, skipReason, streak, missedDays }) => {
                     const isCriticalIncomplete = habit.critical && !completed && !skipped;
@@ -124,12 +102,8 @@ export default function HabitsTab() {
                     return (
                         <div
                             key={habit.habit_key}
-                            className={`bg-white px-6 py-4 rounded-lg border shadow-sm flex items-center gap-4 ${
-                                isCriticalIncomplete
-                                    ? 'border-red-500'
-                                    : completed
-                                    ? 'border-green-200 opacity-60'
-                                    : 'border-stone-200'
+                            className={`bg-[#242424] px-6 py-4 rounded-lg border flex items-center gap-4 ${
+                                isCriticalIncomplete ? 'border-red-500' : completed ? 'border-green-900/50 opacity-60' : 'border-[#333]'
                             }`}
                         >
                             <input
@@ -141,44 +115,15 @@ export default function HabitsTab() {
                             />
                             <div className="flex-1">
                                 <div className="flex items-center gap-2 flex-wrap">
-                                    <span className={`text-lg ${
-                                        completed || skipped ? 'line-through text-gray-400' : 'text-gray-800'
-                                    }`}>
-                                        {habit.label}
-                                    </span>
-                                    {streak > 0 && (
-                                        <span className="text-xs bg-orange-50 text-orange-600 px-2 py-0.5 rounded">
-                                            🔥 {streak} {streak === 1 ? 'day' : 'days'}
-                                        </span>
-                                    )}
-                                    {skipped && (
-                                        <span className="text-xs bg-yellow-50 text-yellow-700 px-2 py-0.5 rounded">
-                                            {skipReason || 'Skip day'} — skipped
-                                        </span>
-                                    )}
+                                    <span className={`text-lg ${completed || skipped ? 'line-through text-gray-500' : 'text-[#ededed]'}`}>{habit.label}</span>
+                                    {streak > 0 && <span className="text-xs bg-orange-900/40 text-orange-400 px-2 py-0.5 rounded">🔥 {streak} {streak === 1 ? 'day' : 'days'}</span>}
+                                    {skipped && <span className="text-xs bg-yellow-900/40 text-yellow-400 px-2 py-0.5 rounded">{skipReason || 'Skip day'} — skipped</span>}
                                 </div>
-                                {/* Shame badges */}
-                                {!completed && !skipped && missedDays === 1 && (
-                                    <span className="text-xs text-red-500 mt-1 block">
-                                        Missed yesterday
-                                    </span>
-                                )}
-                                {!completed && !skipped && missedDays >= 2 && (
-                                    <span className="text-xs text-red-500 mt-1 block">
-                                        Missed {missedDays} days straight
-                                    </span>
-                                )}
+                                {!completed && !skipped && missedDays === 1 && <span className="text-xs text-red-400 mt-1 block">Missed yesterday</span>}
+                                {!completed && !skipped && missedDays >= 2 && <span className="text-xs text-red-400 mt-1 block">Missed {missedDays} days straight</span>}
                             </div>
-                            {isCriticalMissed && (
-                                <span className="text-xs bg-red-600 text-white px-2 py-1 rounded font-bold animate-pulse">
-                                    TAKE YOUR MEDS!
-                                </span>
-                            )}
-                            {isCriticalIncomplete && !isCriticalMissed && (
-                                <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded font-bold">
-                                    CRITICAL
-                                </span>
-                            )}
+                            {isCriticalMissed && <span className="text-xs bg-red-600 text-white px-2 py-1 rounded font-bold animate-pulse">TAKE YOUR MEDS!</span>}
+                            {isCriticalIncomplete && !isCriticalMissed && <span className="text-xs bg-red-900/40 text-red-400 px-2 py-1 rounded font-bold">CRITICAL</span>}
                         </div>
                     );
                 })}

@@ -31,27 +31,13 @@ function getRandomShameMessage() {
 }
 
 function StakeCard({
-    stake,
-    isPast,
-    entryLogs,
-    expandedStakeId,
-    loadingEntries,
-    onCheckIn,
-    onToggleEntryLog,
-    onClaimVictory,
-    onAcceptDefeat,
-    onAbandon,
+    stake, isPast, entryLogs, expandedStakeId, loadingEntries,
+    onCheckIn, onToggleEntryLog, onClaimVictory, onAcceptDefeat, onAbandon,
 }: {
-    stake: StakeWithProgress;
-    isPast: boolean;
-    entryLogs: Record<number, StakeEntry[]>;
-    expandedStakeId: number | null;
-    loadingEntries: number | null;
-    onCheckIn: (id: number) => void;
-    onToggleEntryLog: (id: number) => void;
-    onClaimVictory: (id: number) => void;
-    onAcceptDefeat: (id: number) => void;
-    onAbandon: (id: number) => void;
+    stake: StakeWithProgress; isPast: boolean; entryLogs: Record<number, StakeEntry[]>;
+    expandedStakeId: number | null; loadingEntries: number | null;
+    onCheckIn: (id: number) => void; onToggleEntryLog: (id: number) => void;
+    onClaimVictory: (id: number) => void; onAcceptDefeat: (id: number) => void; onAbandon: (id: number) => void;
 }) {
     const progress = Math.min(stake.current_value / stake.target_count, 1);
     const percent = Math.round(progress * 100);
@@ -63,149 +49,68 @@ function StakeCard({
     const isExpanded = expandedStakeId === stake.id;
 
     return (
-        <div
-            className={`bg-white p-5 rounded-lg border shadow-sm ${
-                isAbandoned
-                    ? 'border-stone-300'
-                    : isWon
-                      ? 'border-green-500'
-                      : isLost
-                        ? 'border-red-500'
-                        : 'border-stone-200'
-            } ${isPast ? 'opacity-70' : ''}`}
-        >
+        <div className={`bg-[#242424] p-5 rounded-lg border ${
+            isAbandoned ? 'border-[#444]' : isWon ? 'border-green-600' : isLost ? 'border-red-600' : 'border-[#333]'
+        } ${isPast ? 'opacity-70' : ''}`}>
             <div className="flex items-center justify-between mb-1">
                 <div>
                     <div className="flex items-center gap-2">
-                        <h3 className={`text-lg font-bold ${isAbandoned ? 'line-through text-gray-400' : 'text-gray-800'}`}>
-                            {stake.title}
-                        </h3>
-                        {isAbandoned && (
-                            <span className="text-gray-400 font-bold text-sm">
-                                QUIT
-                            </span>
-                        )}
-                        {!isAbandoned && isWon && (
-                            <span className="text-green-600 font-bold text-sm animate-pulse">
-                                WON
-                            </span>
-                        )}
-                        {!isAbandoned && isLost && (
-                            <span className="text-red-600 font-bold text-sm">
-                                LOST
-                            </span>
-                        )}
+                        <h3 className={`text-lg font-bold ${isAbandoned ? 'line-through text-gray-500' : 'text-[#ededed]'}`}>{stake.title}</h3>
+                        {isAbandoned && <span className="text-gray-400 font-bold text-sm">QUIT</span>}
+                        {!isAbandoned && isWon && <span className="text-green-400 font-bold text-sm animate-pulse">WON</span>}
+                        {!isAbandoned && isLost && <span className="text-red-400 font-bold text-sm">LOST</span>}
                     </div>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-400">
                         {stake.current_value} / {stake.target_count}
-                        {stake.deadline && (
-                            <span className={isOverdue ? 'text-red-500 ml-2' : 'ml-2'}>
-                                &middot; Due {new Date(stake.deadline).toLocaleDateString()}
-                            </span>
-                        )}
+                        {stake.deadline && <span className={isOverdue ? 'text-red-400 ml-2' : 'ml-2'}>&middot; Due {new Date(stake.deadline).toLocaleDateString()}</span>}
                     </p>
                 </div>
                 <div className="flex items-center gap-2">
                     {!isPast && !isWon && !isLost && (
                         <>
-                            <button
-                                onClick={() => onAbandon(stake.id)}
-                                className="px-3 py-2 rounded text-gray-400 hover:text-red-500 hover:bg-stone-100 text-xs transition-colors"
-                            >
-                                Abandon
-                            </button>
-                            <button
-                                onClick={() => onCheckIn(stake.id)}
-                                className="px-4 py-2 rounded bg-purple-600 hover:bg-purple-700 text-white font-bold text-sm"
-                            >
-                                Check In
-                            </button>
+                            <button onClick={() => onAbandon(stake.id)} className="px-3 py-2 rounded text-gray-500 hover:text-red-400 hover:bg-[#333] text-xs transition-colors">Abandon</button>
+                            <button onClick={() => onCheckIn(stake.id)} className="px-4 py-2 rounded bg-purple-600 hover:bg-purple-700 text-white font-bold text-sm">Check In</button>
                         </>
                     )}
-                    {!isPast && isWon && (
-                        <button
-                            onClick={() => onClaimVictory(stake.id)}
-                            className="px-4 py-2 rounded bg-green-600 hover:bg-green-700 text-white font-bold text-sm"
-                        >
-                            Claim Victory
-                        </button>
-                    )}
-                    {!isPast && isLost && (
-                        <button
-                            onClick={() => onAcceptDefeat(stake.id)}
-                            className="px-4 py-2 rounded bg-red-600 hover:bg-red-700 text-white font-bold text-sm"
-                        >
-                            Accept Defeat
-                        </button>
-                    )}
+                    {!isPast && isWon && <button onClick={() => onClaimVictory(stake.id)} className="px-4 py-2 rounded bg-green-600 hover:bg-green-700 text-white font-bold text-sm">Claim Victory</button>}
+                    {!isPast && isLost && <button onClick={() => onAcceptDefeat(stake.id)} className="px-4 py-2 rounded bg-red-600 hover:bg-red-700 text-white font-bold text-sm">Accept Defeat</button>}
                 </div>
             </div>
 
-            {/* Reward / Consequence */}
             {(stake.reward || stake.consequence) && (
                 <div className="flex gap-4 mb-2 text-xs">
-                    {stake.reward && (
-                        <span className="text-green-600">Reward: {stake.reward}</span>
-                    )}
-                    {stake.consequence && (
-                        <span className="text-red-600">Consequence: {stake.consequence}</span>
-                    )}
+                    {stake.reward && <span className="text-green-400">Reward: {stake.reward}</span>}
+                    {stake.consequence && <span className="text-red-400">Consequence: {stake.consequence}</span>}
                 </div>
             )}
 
-            {/* Progress Bar */}
-            <div className="w-full bg-stone-200 rounded-full h-3 overflow-hidden">
-                <div
-                    className={`h-full rounded-full transition-all duration-500 ${
-                        isAbandoned
-                            ? 'bg-gray-400'
-                            : isWon
-                              ? 'bg-green-500'
-                              : isOverdue
-                                ? 'bg-red-500'
-                                : 'bg-purple-500'
-                    }`}
-                    style={{ width: `${percent}%` }}
-                />
+            <div className="w-full bg-[#333] rounded-full h-3 overflow-hidden">
+                <div className={`h-full rounded-full transition-all duration-500 ${isAbandoned ? 'bg-gray-600' : isWon ? 'bg-green-500' : isOverdue ? 'bg-red-500' : 'bg-purple-500'}`} style={{ width: `${percent}%` }} />
             </div>
-            <p className="text-right text-xs text-gray-400 mt-1">{percent}%</p>
+            <p className="text-right text-xs text-gray-500 mt-1">{percent}%</p>
 
-            {/* Entry Log Toggle */}
             {stake.entry_count > 0 && (
-                <button
-                    onClick={() => onToggleEntryLog(stake.id)}
-                    className="text-xs text-gray-400 hover:text-purple-600 mt-1 transition-colors"
-                >
+                <button onClick={() => onToggleEntryLog(stake.id)} className="text-xs text-gray-500 hover:text-purple-400 mt-1 transition-colors">
                     {isExpanded ? 'Hide check-ins' : `Show check-ins (${stake.entry_count})`}
                 </button>
             )}
 
-            {/* Entry Log */}
             {isExpanded && (
                 <div className="mt-3 space-y-2">
                     {loadingEntries === stake.id ? (
-                        <p className="text-xs text-gray-400">Loading...</p>
+                        <p className="text-xs text-gray-500">Loading...</p>
                     ) : entries && entries.length > 0 ? (
                         entries.map((entry) => (
-                            <div
-                                key={entry.id}
-                                className="bg-stone-50 rounded px-3 py-2 text-sm flex items-center justify-between"
-                            >
-                                <div className="text-gray-700">
-                                    {entry.amount != null && (
-                                        <span className="text-purple-600 font-semibold mr-2">
-                                            {entry.amount}
-                                        </span>
-                                    )}
-                                    {entry.note || <span className="text-gray-400 italic">No note</span>}
+                            <div key={entry.id} className="bg-[#1a1a1a] rounded px-3 py-2 text-sm flex items-center justify-between">
+                                <div className="text-gray-300">
+                                    {entry.amount != null && <span className="text-purple-400 font-semibold mr-2">{entry.amount}</span>}
+                                    {entry.note || <span className="text-gray-600 italic">No note</span>}
                                 </div>
-                                <span className="text-xs text-gray-400 ml-3 shrink-0">
-                                    {new Date(entry.created_at).toLocaleDateString()}
-                                </span>
+                                <span className="text-xs text-gray-500 ml-3 shrink-0">{new Date(entry.created_at).toLocaleDateString()}</span>
                             </div>
                         ))
                     ) : (
-                        <p className="text-xs text-gray-400">No entries yet.</p>
+                        <p className="text-xs text-gray-500">No entries yet.</p>
                     )}
                 </div>
             )}
@@ -223,385 +128,179 @@ export default function StakesTab() {
     const [deadline, setDeadline] = useState('');
     const [reward, setReward] = useState('');
     const [consequence, setConsequence] = useState('');
-
-    // Check-in modal state
     const [checkInStakeId, setCheckInStakeId] = useState<number | null>(null);
     const [checkInAmount, setCheckInAmount] = useState('');
     const [checkInNote, setCheckInNote] = useState('');
-
-    // Entry log state: stakeId -> entries
     const [entryLogs, setEntryLogs] = useState<Record<number, StakeEntry[]>>({});
     const [expandedStakeId, setExpandedStakeId] = useState<number | null>(null);
     const [loadingEntries, setLoadingEntries] = useState<number | null>(null);
-
-    // Victory celebration
     const [celebrateStakeTitle, setCelebrateStakeTitle] = useState<string | null>(null);
-
-    // Abandon modal state
     const [abandonStakeId, setAbandonStakeId] = useState<number | null>(null);
     const [abandonConfirmText, setAbandonConfirmText] = useState('');
-
-    // Shame message popup
     const [shameMessage, setShameMessage] = useState<string | null>(null);
 
-    useEffect(() => {
-        loadAllStakes();
-    }, []);
+    useEffect(() => { loadAllStakes(); }, []);
 
     const loadAllStakes = async () => {
         try {
-            const [activeResult, inactiveResult] = await Promise.all([
-                getActiveStakes(),
-                getInactiveStakes(),
-            ]);
+            const [activeResult, inactiveResult] = await Promise.all([getActiveStakes(), getInactiveStakes()]);
             if (activeResult.error) throw new Error(activeResult.error);
             if (inactiveResult.error) throw new Error(inactiveResult.error);
             setStakes(activeResult.data || []);
             setPastStakes(inactiveResult.data || []);
-        } catch (error) {
-            console.error('Error loading stakes:', error);
-        } finally {
-            setLoading(false);
-        }
+        } catch (error) { console.error('Error loading stakes:', error); } finally { setLoading(false); }
     };
 
     const handleCreateStake = async () => {
         const target = parseInt(targetCount);
         if (!title.trim() || isNaN(target) || target < 1) return;
-
         try {
-            const { data, error } = await createStake(
-                title.trim(),
-                target,
-                deadline || null,
-                reward.trim() || null,
-                consequence.trim() || null
-            );
+            const { data, error } = await createStake(title.trim(), target, deadline || null, reward.trim() || null, consequence.trim() || null);
             if (error) throw new Error(error);
-            if (data) {
-                setStakes([data, ...stakes]);
-                setTitle('');
-                setTargetCount('');
-                setDeadline('');
-                setReward('');
-                setConsequence('');
-                setShowForm(false);
-            }
-        } catch (error) {
-            console.error('Error creating stake:', error);
-        }
+            if (data) { setStakes([data, ...stakes]); setTitle(''); setTargetCount(''); setDeadline(''); setReward(''); setConsequence(''); setShowForm(false); }
+        } catch (error) { console.error('Error creating stake:', error); }
     };
 
-    const openCheckInModal = (stakeId: number) => {
-        setCheckInStakeId(stakeId);
-        setCheckInAmount('');
-        setCheckInNote('');
-    };
+    const openCheckInModal = (stakeId: number) => { setCheckInStakeId(stakeId); setCheckInAmount(''); setCheckInNote(''); };
 
     const handleCheckInSubmit = async () => {
         if (checkInStakeId === null) return;
-
         const amount = checkInAmount ? parseFloat(checkInAmount) : null;
-
         try {
-            const { data, error } = await addStakeEntry(
-                checkInStakeId,
-                checkInNote.trim() || null,
-                amount
-            );
+            const { data, error } = await addStakeEntry(checkInStakeId, checkInNote.trim() || null, amount);
             if (error) throw new Error(error);
-
-            setStakes(stakes.map(s =>
-                s.id === checkInStakeId
-                    ? { ...s, current_value: s.current_value + (amount ?? 0), entry_count: s.entry_count + 1 }
-                    : s
-            ));
-
-            // Update entry log if expanded
-            if (expandedStakeId === checkInStakeId && data) {
-                setEntryLogs(prev => ({
-                    ...prev,
-                    [checkInStakeId]: [data, ...(prev[checkInStakeId] || [])],
-                }));
-            }
-
+            setStakes(stakes.map(s => s.id === checkInStakeId ? { ...s, current_value: s.current_value + (amount ?? 0), entry_count: s.entry_count + 1 } : s));
+            if (expandedStakeId === checkInStakeId && data) { setEntryLogs(prev => ({ ...prev, [checkInStakeId]: [data, ...(prev[checkInStakeId] || [])] })); }
             setCheckInStakeId(null);
-        } catch (error) {
-            console.error('Error adding entry:', error);
-        }
+        } catch (error) { console.error('Error adding entry:', error); }
     };
 
     const toggleEntryLog = async (stakeId: number) => {
-        if (expandedStakeId === stakeId) {
-            setExpandedStakeId(null);
-            return;
-        }
-
+        if (expandedStakeId === stakeId) { setExpandedStakeId(null); return; }
         setExpandedStakeId(stakeId);
-
         if (!entryLogs[stakeId]) {
             setLoadingEntries(stakeId);
             try {
                 const { data, error } = await getStakeEntries(stakeId);
                 if (error) throw new Error(error);
                 setEntryLogs(prev => ({ ...prev, [stakeId]: data || [] }));
-            } catch (error) {
-                console.error('Error loading entries:', error);
-            } finally {
-                setLoadingEntries(null);
-            }
+            } catch (error) { console.error('Error loading entries:', error); } finally { setLoadingEntries(null); }
         }
     };
 
     const handleClaimVictory = async (stakeId: number) => {
         const stake = stakes.find(s => s.id === stakeId);
         if (!stake) return;
-
         try {
             const { error } = await deactivateStake(stakeId);
             if (error) throw new Error(error);
-
             setStakes(prev => prev.filter(s => s.id !== stakeId));
             setPastStakes(prev => [stake, ...prev]);
             setCelebrateStakeTitle(stake.title);
             setTimeout(() => setCelebrateStakeTitle(null), 5000);
-        } catch (error) {
-            console.error('Error claiming victory:', error);
-        }
+        } catch (error) { console.error('Error claiming victory:', error); }
     };
 
     const handleAcceptDefeat = async (stakeId: number) => {
         const stake = stakes.find(s => s.id === stakeId);
         if (!stake) return;
-
         try {
             const { error } = await deactivateStake(stakeId);
             if (error) throw new Error(error);
-
             setStakes(prev => prev.filter(s => s.id !== stakeId));
             setPastStakes(prev => [stake, ...prev]);
-        } catch (error) {
-            console.error('Error accepting defeat:', error);
-        }
+        } catch (error) { console.error('Error accepting defeat:', error); }
     };
 
-    const openAbandonModal = (stakeId: number) => {
-        setAbandonStakeId(stakeId);
-        setAbandonConfirmText('');
-    };
+    const openAbandonModal = (stakeId: number) => { setAbandonStakeId(stakeId); setAbandonConfirmText(''); };
 
     const handleAbandonConfirm = async () => {
         if (abandonStakeId === null) return;
         const stake = stakes.find(s => s.id === abandonStakeId);
-        if (!stake) return;
-        if (abandonConfirmText !== stake.title) return;
-
+        if (!stake || abandonConfirmText !== stake.title) return;
         try {
             const { error } = await abandonStake(abandonStakeId);
             if (error) throw new Error(error);
-
-            const abandonedStake = { ...stake, active: false, abandoned: true };
             setStakes(prev => prev.filter(s => s.id !== abandonStakeId));
-            setPastStakes(prev => [abandonedStake, ...prev]);
+            setPastStakes(prev => [{ ...stake, active: false, abandoned: true }, ...prev]);
             setAbandonStakeId(null);
-
             const msg = getRandomShameMessage();
             setShameMessage(msg);
             setTimeout(() => setShameMessage(null), 5000);
-        } catch (error) {
-            console.error('Error abandoning stake:', error);
-        }
+        } catch (error) { console.error('Error abandoning stake:', error); }
     };
 
-    const abandonTarget = abandonStakeId !== null
-        ? stakes.find(s => s.id === abandonStakeId)
-        : null;
+    const abandonTarget = abandonStakeId !== null ? stakes.find(s => s.id === abandonStakeId) : null;
 
-    if (loading) {
-        return <p className="text-gray-400 text-center py-8">Loading stakes...</p>;
-    }
+    if (loading) return <p className="text-gray-400 text-center py-8">Loading stakes...</p>;
 
     return (
         <div>
-            {/* Victory Celebration */}
             {celebrateStakeTitle && (
-                <div
-                    className="fixed inset-0 bg-black/70 flex items-center justify-center z-50"
-                    onClick={() => setCelebrateStakeTitle(null)}
-                >
+                <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50" onClick={() => setCelebrateStakeTitle(null)}>
                     <div className="bg-gradient-to-br from-yellow-400 via-green-500 to-emerald-600 p-1 rounded-2xl animate-pulse">
                         <div className="bg-gray-900 rounded-2xl p-8 text-center max-w-md">
-                            <div className="text-6xl mb-4 animate-bounce">
-                                🎉🏆🎉
-                            </div>
-                            <h2 className="text-3xl font-bold text-white mb-2">
-                                VICTORY!
-                            </h2>
-                            <p className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-green-500 mb-4">
-                                {celebrateStakeTitle}
-                            </p>
-                            <p className="text-gray-300 mb-6">
-                                You crushed it! Stake complete.
-                            </p>
-                            <button
-                                onClick={() => setCelebrateStakeTitle(null)}
-                                className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-3 px-8 rounded-full transition-all transform hover:scale-105"
-                            >
-                                Onward!
-                            </button>
+                            <div className="text-6xl mb-4 animate-bounce">🎉🏆🎉</div>
+                            <h2 className="text-3xl font-bold text-white mb-2">VICTORY!</h2>
+                            <p className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-green-500 mb-4">{celebrateStakeTitle}</p>
+                            <p className="text-gray-300 mb-6">You crushed it! Stake complete.</p>
+                            <button onClick={() => setCelebrateStakeTitle(null)} className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-3 px-8 rounded-full transition-all transform hover:scale-105">Onward!</button>
                         </div>
                     </div>
                 </div>
             )}
 
-            {/* Shame Message */}
             {shameMessage && (
-                <div
-                    className="fixed inset-0 bg-black/70 flex items-center justify-center z-50"
-                    onClick={() => setShameMessage(null)}
-                >
+                <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50" onClick={() => setShameMessage(null)}>
                     <div className="bg-gradient-to-br from-gray-600 via-gray-700 to-gray-800 p-1 rounded-2xl">
                         <div className="bg-gray-900 rounded-2xl p-8 text-center max-w-md">
-                            <div className="text-6xl mb-4">
-                                😔
-                            </div>
-                            <h2 className="text-2xl font-bold text-gray-400 mb-4">
-                                Stake Abandoned
-                            </h2>
-                            <p className="text-gray-300 mb-6 italic">
-                                &ldquo;{shameMessage}&rdquo;
-                            </p>
-                            <button
-                                onClick={() => setShameMessage(null)}
-                                className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-8 rounded-full transition-all"
-                            >
-                                Yeah, yeah...
-                            </button>
+                            <div className="text-6xl mb-4">😔</div>
+                            <h2 className="text-2xl font-bold text-gray-400 mb-4">Stake Abandoned</h2>
+                            <p className="text-gray-300 mb-6 italic">&ldquo;{shameMessage}&rdquo;</p>
+                            <button onClick={() => setShameMessage(null)} className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-8 rounded-full transition-all">Yeah, yeah...</button>
                         </div>
                     </div>
                 </div>
             )}
 
-            {/* New Stake Button / Form */}
             {!showForm ? (
-                <button
-                    onClick={() => setShowForm(true)}
-                    className="w-full bg-white text-gray-400 text-lg px-6 py-4 rounded-lg border-2 border-dashed border-stone-300 hover:border-purple-500 hover:text-purple-600 mb-8 transition-colors"
-                >
-                    + New Stake
-                </button>
+                <button onClick={() => setShowForm(true)} className="w-full bg-[#242424] text-gray-400 text-lg px-6 py-4 rounded-lg border-2 border-dashed border-[#444] hover:border-purple-500 hover:text-purple-400 mb-8 transition-colors">+ New Stake</button>
             ) : (
-                <div className="bg-white p-6 rounded-lg border-2 border-purple-400 shadow-sm mb-8">
-                    <h3 className="text-lg font-bold text-purple-600 mb-4">Create a Stake</h3>
+                <div className="bg-[#242424] p-6 rounded-lg border-2 border-purple-700 mb-8">
+                    <h3 className="text-lg font-bold text-purple-400 mb-4">Create a Stake</h3>
                     <div className="space-y-3">
-                        <input
-                            type="text"
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                            placeholder="What's at stake? (e.g. Run 30 times)"
-                            className="w-full bg-white text-gray-800 px-4 py-3 rounded border border-stone-200 focus:border-purple-500 focus:outline-none"
-                        />
-                        <input
-                            type="number"
-                            value={targetCount}
-                            onChange={(e) => setTargetCount(e.target.value)}
-                            placeholder="Target count (e.g. 30)"
-                            min="1"
-                            className="w-full bg-white text-gray-800 px-4 py-3 rounded border border-stone-200 focus:border-purple-500 focus:outline-none"
-                        />
-                        <input
-                            type="date"
-                            value={deadline}
-                            onChange={(e) => setDeadline(e.target.value)}
-                            className="w-full bg-white text-gray-800 px-4 py-3 rounded border border-stone-200 focus:border-purple-500 focus:outline-none"
-                        />
-                        <input
-                            type="text"
-                            value={reward}
-                            onChange={(e) => setReward(e.target.value)}
-                            placeholder="Reward (optional, e.g. Buy new shoes)"
-                            className="w-full bg-white text-gray-800 px-4 py-3 rounded border border-stone-200 focus:border-purple-500 focus:outline-none"
-                        />
-                        <input
-                            type="text"
-                            value={consequence}
-                            onChange={(e) => setConsequence(e.target.value)}
-                            placeholder="Consequence (optional, e.g. Donate $50 to charity)"
-                            className="w-full bg-white text-gray-800 px-4 py-3 rounded border border-stone-200 focus:border-purple-500 focus:outline-none"
-                        />
+                        <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="What's at stake? (e.g. Run 30 times)" className="w-full bg-[#1a1a1a] text-[#ededed] px-4 py-3 rounded border border-[#333] focus:border-purple-500 focus:outline-none" />
+                        <input type="number" value={targetCount} onChange={(e) => setTargetCount(e.target.value)} placeholder="Target count (e.g. 30)" min="1" className="w-full bg-[#1a1a1a] text-[#ededed] px-4 py-3 rounded border border-[#333] focus:border-purple-500 focus:outline-none" />
+                        <input type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} className="w-full bg-[#1a1a1a] text-[#ededed] px-4 py-3 rounded border border-[#333] focus:border-purple-500 focus:outline-none" style={{ colorScheme: 'dark' }} />
+                        <input type="text" value={reward} onChange={(e) => setReward(e.target.value)} placeholder="Reward (optional)" className="w-full bg-[#1a1a1a] text-[#ededed] px-4 py-3 rounded border border-[#333] focus:border-purple-500 focus:outline-none" />
+                        <input type="text" value={consequence} onChange={(e) => setConsequence(e.target.value)} placeholder="Consequence (optional)" className="w-full bg-[#1a1a1a] text-[#ededed] px-4 py-3 rounded border border-[#333] focus:border-purple-500 focus:outline-none" />
                         <div className="flex gap-3 pt-2">
-                            <button
-                                onClick={handleCreateStake}
-                                className="px-6 py-2 rounded bg-purple-600 hover:bg-purple-700 text-white font-bold"
-                            >
-                                Create
-                            </button>
-                            <button
-                                onClick={() => {
-                                    setShowForm(false);
-                                    setTitle('');
-                                    setTargetCount('');
-                                    setDeadline('');
-                                    setReward('');
-                                    setConsequence('');
-                                }}
-                                className="px-6 py-2 rounded bg-stone-200 hover:bg-stone-300 text-gray-700"
-                            >
-                                Cancel
-                            </button>
+                            <button onClick={handleCreateStake} className="px-6 py-2 rounded bg-purple-600 hover:bg-purple-700 text-white font-bold">Create</button>
+                            <button onClick={() => { setShowForm(false); setTitle(''); setTargetCount(''); setDeadline(''); setReward(''); setConsequence(''); }} className="px-6 py-2 rounded bg-[#333] hover:bg-[#444] text-gray-300">Cancel</button>
                         </div>
                     </div>
                 </div>
             )}
 
-            {/* Active Stakes */}
             {stakes.length === 0 && pastStakes.length === 0 ? (
-                <div className="text-center py-12 text-gray-400">
+                <div className="text-center py-12 text-gray-500">
                     <p className="text-lg">No active stakes yet.</p>
                     <p className="text-sm mt-2">Create one to start tracking your commitment.</p>
                 </div>
             ) : (
                 <>
-                    {stakes.length === 0 && (
-                        <p className="text-gray-400 text-center py-6">No active stakes. Create one above!</p>
-                    )}
+                    {stakes.length === 0 && <p className="text-gray-500 text-center py-6">No active stakes. Create one above!</p>}
                     <div className="space-y-4">
                         {stakes.map((stake) => (
-                            <StakeCard
-                                key={stake.id}
-                                stake={stake}
-                                isPast={false}
-                                entryLogs={entryLogs}
-                                expandedStakeId={expandedStakeId}
-                                loadingEntries={loadingEntries}
-                                onCheckIn={openCheckInModal}
-                                onToggleEntryLog={toggleEntryLog}
-                                onClaimVictory={handleClaimVictory}
-                                onAcceptDefeat={handleAcceptDefeat}
-                                onAbandon={openAbandonModal}
-                            />
+                            <StakeCard key={stake.id} stake={stake} isPast={false} entryLogs={entryLogs} expandedStakeId={expandedStakeId} loadingEntries={loadingEntries} onCheckIn={openCheckInModal} onToggleEntryLog={toggleEntryLog} onClaimVictory={handleClaimVictory} onAcceptDefeat={handleAcceptDefeat} onAbandon={openAbandonModal} />
                         ))}
                     </div>
-
-                    {/* Past Stakes */}
                     {pastStakes.length > 0 && (
                         <div className="mt-10">
-                            <h3 className="text-gray-400 font-bold text-sm uppercase tracking-wider mb-4">Past Stakes</h3>
+                            <h3 className="text-gray-500 font-bold text-sm uppercase tracking-wider mb-4">Past Stakes</h3>
                             <div className="space-y-4">
                                 {pastStakes.map((stake) => (
-                                    <StakeCard
-                                        key={stake.id}
-                                        stake={stake}
-                                        isPast={true}
-                                        entryLogs={entryLogs}
-                                        expandedStakeId={expandedStakeId}
-                                        loadingEntries={loadingEntries}
-                                        onCheckIn={openCheckInModal}
-                                        onToggleEntryLog={toggleEntryLog}
-                                        onClaimVictory={handleClaimVictory}
-                                        onAcceptDefeat={handleAcceptDefeat}
-                                        onAbandon={openAbandonModal}
-                                    />
+                                    <StakeCard key={stake.id} stake={stake} isPast={true} entryLogs={entryLogs} expandedStakeId={expandedStakeId} loadingEntries={loadingEntries} onCheckIn={openCheckInModal} onToggleEntryLog={toggleEntryLog} onClaimVictory={handleClaimVictory} onAcceptDefeat={handleAcceptDefeat} onAbandon={openAbandonModal} />
                                 ))}
                             </div>
                         </div>
@@ -609,41 +308,17 @@ export default function StakesTab() {
                 </>
             )}
 
-            {/* Check-in Modal */}
             {checkInStakeId !== null && (
-                <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+                <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
                     <div className="bg-gradient-to-br from-purple-500 to-indigo-600 p-1 rounded-2xl">
-                        <div className="bg-white rounded-2xl p-6 w-80">
-                            <h3 className="text-lg font-bold text-purple-600 mb-4">Check In</h3>
+                        <div className="bg-[#242424] rounded-2xl p-6 w-80">
+                            <h3 className="text-lg font-bold text-purple-400 mb-4">Check In</h3>
                             <div className="space-y-3">
-                                <input
-                                    type="number"
-                                    value={checkInAmount}
-                                    onChange={(e) => setCheckInAmount(e.target.value)}
-                                    placeholder="Amount (optional, e.g. 3.5)"
-                                    step="any"
-                                    className="w-full bg-white text-gray-800 px-4 py-3 rounded border border-stone-200 focus:border-purple-500 focus:outline-none"
-                                />
-                                <input
-                                    type="text"
-                                    value={checkInNote}
-                                    onChange={(e) => setCheckInNote(e.target.value)}
-                                    placeholder="Note (optional)"
-                                    className="w-full bg-white text-gray-800 px-4 py-3 rounded border border-stone-200 focus:border-purple-500 focus:outline-none"
-                                />
+                                <input type="number" value={checkInAmount} onChange={(e) => setCheckInAmount(e.target.value)} placeholder="Amount (optional)" step="any" className="w-full bg-[#1a1a1a] text-[#ededed] px-4 py-3 rounded border border-[#333] focus:border-purple-500 focus:outline-none" />
+                                <input type="text" value={checkInNote} onChange={(e) => setCheckInNote(e.target.value)} placeholder="Note (optional)" className="w-full bg-[#1a1a1a] text-[#ededed] px-4 py-3 rounded border border-[#333] focus:border-purple-500 focus:outline-none" />
                                 <div className="flex gap-3 pt-2">
-                                    <button
-                                        onClick={handleCheckInSubmit}
-                                        className="px-6 py-2 rounded bg-purple-600 hover:bg-purple-700 text-white font-bold"
-                                    >
-                                        Submit
-                                    </button>
-                                    <button
-                                        onClick={() => setCheckInStakeId(null)}
-                                        className="px-6 py-2 rounded bg-stone-200 hover:bg-stone-300 text-gray-700"
-                                    >
-                                        Cancel
-                                    </button>
+                                    <button onClick={handleCheckInSubmit} className="px-6 py-2 rounded bg-purple-600 hover:bg-purple-700 text-white font-bold">Submit</button>
+                                    <button onClick={() => setCheckInStakeId(null)} className="px-6 py-2 rounded bg-[#333] hover:bg-[#444] text-gray-300">Cancel</button>
                                 </div>
                             </div>
                         </div>
@@ -651,41 +326,16 @@ export default function StakesTab() {
                 </div>
             )}
 
-            {/* Abandon Confirmation Modal */}
             {abandonTarget && (
-                <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-                    <div className="bg-gradient-to-br from-red-500 to-gray-600 p-1 rounded-2xl">
-                        <div className="bg-white rounded-2xl p-6 w-96">
-                            <h3 className="text-lg font-bold text-red-600 mb-2">Abandon Stake?</h3>
-                            <p className="text-gray-500 text-sm mb-4">
-                                Type <span className="text-gray-800 font-bold">&ldquo;{abandonTarget.title}&rdquo;</span> to confirm you&apos;re giving up.
-                            </p>
-                            <input
-                                type="text"
-                                value={abandonConfirmText}
-                                onChange={(e) => setAbandonConfirmText(e.target.value)}
-                                placeholder="Type the stake title to confirm"
-                                className="w-full bg-white text-gray-800 px-4 py-3 rounded border border-stone-200 focus:border-red-500 focus:outline-none mb-4"
-                                autoFocus
-                            />
+                <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+                    <div className="bg-gradient-to-br from-red-800 to-gray-800 p-1 rounded-2xl">
+                        <div className="bg-[#242424] rounded-2xl p-6 w-96">
+                            <h3 className="text-lg font-bold text-red-400 mb-2">Abandon Stake?</h3>
+                            <p className="text-gray-400 text-sm mb-4">Type <span className="text-[#ededed] font-bold">&ldquo;{abandonTarget.title}&rdquo;</span> to confirm you&apos;re giving up.</p>
+                            <input type="text" value={abandonConfirmText} onChange={(e) => setAbandonConfirmText(e.target.value)} placeholder="Type the stake title to confirm" className="w-full bg-[#1a1a1a] text-[#ededed] px-4 py-3 rounded border border-[#333] focus:border-red-500 focus:outline-none mb-4" autoFocus />
                             <div className="flex gap-3">
-                                <button
-                                    onClick={handleAbandonConfirm}
-                                    disabled={abandonConfirmText !== abandonTarget.title}
-                                    className={`px-6 py-2 rounded font-bold text-sm ${
-                                        abandonConfirmText === abandonTarget.title
-                                            ? 'bg-red-600 hover:bg-red-700 text-white'
-                                            : 'bg-stone-200 text-gray-400 cursor-not-allowed'
-                                    }`}
-                                >
-                                    I Quit
-                                </button>
-                                <button
-                                    onClick={() => setAbandonStakeId(null)}
-                                    className="px-6 py-2 rounded bg-stone-200 hover:bg-stone-300 text-gray-700 font-bold text-sm"
-                                >
-                                    Never Mind
-                                </button>
+                                <button onClick={handleAbandonConfirm} disabled={abandonConfirmText !== abandonTarget.title} className={`px-6 py-2 rounded font-bold text-sm ${abandonConfirmText === abandonTarget.title ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-[#333] text-gray-500 cursor-not-allowed'}`}>I Quit</button>
+                                <button onClick={() => setAbandonStakeId(null)} className="px-6 py-2 rounded bg-[#333] hover:bg-[#444] text-gray-300 font-bold text-sm">Never Mind</button>
                             </div>
                         </div>
                     </div>

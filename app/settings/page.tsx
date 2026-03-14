@@ -14,7 +14,6 @@ function daysInMonth(month: number, year: number): number {
 }
 
 export default function SettingsPage() {
-    // Skip days state
     const [skipDays, setSkipDays] = useState<SkipDay[]>([]);
     const [skipLoading, setSkipLoading] = useState(true);
     const [skipMonth, setSkipMonth] = useState(new Date().getMonth() + 1);
@@ -24,7 +23,6 @@ export default function SettingsPage() {
     const [autoRecovery, setAutoRecovery] = useState(false);
     const [submittingSkip, setSubmittingSkip] = useState(false);
 
-    // Habits state
     const [habits, setHabits] = useState<Habit[]>([]);
     const [habitsLoading, setHabitsLoading] = useState(true);
     const [newLabel, setNewLabel] = useState('');
@@ -39,7 +37,6 @@ export default function SettingsPage() {
         loadHabits();
     }, []);
 
-    // Skip days
     const loadSkipDays = async () => {
         try {
             const { data, error } = await getSkipDays();
@@ -80,7 +77,6 @@ export default function SettingsPage() {
         }
     };
 
-    // Habits
     const loadHabits = async () => {
         try {
             const { data, error } = await getHabits();
@@ -170,47 +166,34 @@ export default function SettingsPage() {
     };
 
     return (
-        <div className="min-h-screen bg-stone-50 text-gray-800 p-4">
+        <div className="min-h-screen bg-[#1a1a1a] text-[#ededed] p-4">
             <div className="max-w-2xl mx-auto py-8">
                 <div className="flex items-center gap-4 mb-8">
-                    <Link href="/" className="text-gray-400 hover:text-gray-800 text-sm">&larr; Back</Link>
+                    <Link href="/" className="text-gray-400 hover:text-white text-sm">&larr; Back</Link>
                     <h1 className="text-3xl font-bold">Settings</h1>
                 </div>
 
                 {/* Manage Habits Section */}
                 <div className="mb-12">
-                    <h2 className="text-xl font-bold text-gray-700 mb-4">Manage Habits</h2>
+                    <h2 className="text-xl font-bold text-gray-300 mb-4">Manage Habits</h2>
 
-                    {/* Add Habit Form */}
-                    <form onSubmit={handleAddHabit} className="mb-6 p-4 bg-white rounded-lg border border-stone-200 shadow-sm space-y-4">
-                        <h3 className="text-lg font-bold text-gray-600">Add Habit</h3>
+                    <form onSubmit={handleAddHabit} className="mb-6 p-4 bg-[#242424] rounded-lg border border-[#333] space-y-4">
+                        <h3 className="text-lg font-bold text-gray-300">Add Habit</h3>
                         <input
                             type="text"
                             value={newLabel}
                             onChange={(e) => setNewLabel(e.target.value)}
                             placeholder="Habit name..."
                             required
-                            className="w-full bg-white text-gray-800 px-4 py-2 rounded border border-stone-200 focus:border-teal-500 focus:outline-none"
+                            className="w-full bg-[#1a1a1a] text-[#ededed] px-4 py-2 rounded border border-[#333] focus:border-teal-500 focus:outline-none"
                         />
                         <div className="flex gap-4 items-center">
-                            <label className="flex items-center gap-2 text-sm text-gray-600">
-                                <input
-                                    type="radio"
-                                    name="frequency"
-                                    checked={newFrequency === 'daily'}
-                                    onChange={() => setNewFrequency('daily')}
-                                    className="accent-teal-600"
-                                />
+                            <label className="flex items-center gap-2 text-sm text-gray-300">
+                                <input type="radio" name="frequency" checked={newFrequency === 'daily'} onChange={() => setNewFrequency('daily')} className="accent-teal-500" />
                                 Daily
                             </label>
-                            <label className="flex items-center gap-2 text-sm text-gray-600">
-                                <input
-                                    type="radio"
-                                    name="frequency"
-                                    checked={newFrequency === 'specific_days'}
-                                    onChange={() => setNewFrequency('specific_days')}
-                                    className="accent-teal-600"
-                                />
+                            <label className="flex items-center gap-2 text-sm text-gray-300">
+                                <input type="radio" name="frequency" checked={newFrequency === 'specific_days'} onChange={() => setNewFrequency('specific_days')} className="accent-teal-500" />
                                 Specific Days
                             </label>
                         </div>
@@ -222,9 +205,7 @@ export default function SettingsPage() {
                                         type="button"
                                         onClick={() => toggleDay(i)}
                                         className={`px-3 py-1 rounded text-sm ${
-                                            newDays.includes(i)
-                                                ? 'bg-teal-600 text-white'
-                                                : 'bg-stone-200 text-gray-500'
+                                            newDays.includes(i) ? 'bg-teal-600 text-white' : 'bg-[#333] text-gray-400'
                                         }`}
                                     >
                                         {label}
@@ -233,35 +214,20 @@ export default function SettingsPage() {
                             </div>
                         )}
                         <div className="flex gap-4">
-                            <label className="flex items-center gap-2 text-sm text-gray-500">
-                                <input
-                                    type="checkbox"
-                                    checked={newSkippable}
-                                    onChange={(e) => setNewSkippable(e.target.checked)}
-                                    className="accent-teal-600"
-                                />
+                            <label className="flex items-center gap-2 text-sm text-gray-400">
+                                <input type="checkbox" checked={newSkippable} onChange={(e) => setNewSkippable(e.target.checked)} className="accent-teal-500" />
                                 Skippable on skip days
                             </label>
-                            <label className="flex items-center gap-2 text-sm text-gray-500">
-                                <input
-                                    type="checkbox"
-                                    checked={newCritical}
-                                    onChange={(e) => setNewCritical(e.target.checked)}
-                                    className="accent-red-500"
-                                />
+                            <label className="flex items-center gap-2 text-sm text-gray-400">
+                                <input type="checkbox" checked={newCritical} onChange={(e) => setNewCritical(e.target.checked)} className="accent-red-500" />
                                 Critical (urgent UI)
                             </label>
                         </div>
-                        <button
-                            type="submit"
-                            disabled={submittingHabit}
-                            className="px-6 py-2 rounded bg-teal-600 hover:bg-teal-700 text-white font-bold disabled:opacity-50"
-                        >
+                        <button type="submit" disabled={submittingHabit} className="px-6 py-2 rounded bg-teal-600 hover:bg-teal-700 text-white font-bold disabled:opacity-50">
                             {submittingHabit ? 'Adding...' : 'Add Habit'}
                         </button>
                     </form>
 
-                    {/* Habits List */}
                     {habitsLoading ? (
                         <p className="text-center text-gray-400">Loading habits...</p>
                     ) : habits.length === 0 ? (
@@ -269,64 +235,23 @@ export default function SettingsPage() {
                     ) : (
                         <div className="space-y-2">
                             {habits.map((habit) => (
-                                <div
-                                    key={habit.id}
-                                    className={`bg-white px-4 py-3 rounded-lg border shadow-sm flex items-center justify-between gap-3 ${
-                                        habit.active ? 'border-stone-200' : 'border-stone-200 opacity-50'
-                                    }`}
-                                >
+                                <div key={habit.id} className={`bg-[#242424] px-4 py-3 rounded-lg border flex items-center justify-between gap-3 ${habit.active ? 'border-[#333]' : 'border-[#333] opacity-50'}`}>
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-2 flex-wrap">
-                                            <span className="text-gray-800 font-medium">{habit.label}</span>
-                                            {habit.critical && (
-                                                <span className="text-xs bg-red-50 text-red-600 px-1.5 py-0.5 rounded">critical</span>
-                                            )}
-                                            {!habit.skippable && (
-                                                <span className="text-xs bg-yellow-50 text-yellow-700 px-1.5 py-0.5 rounded">no-skip</span>
-                                            )}
-                                            {!habit.active && (
-                                                <span className="text-xs bg-stone-100 text-gray-400 px-1.5 py-0.5 rounded">inactive</span>
-                                            )}
+                                            <span className="text-[#ededed] font-medium">{habit.label}</span>
+                                            {habit.critical && <span className="text-xs bg-red-900/40 text-red-400 px-1.5 py-0.5 rounded">critical</span>}
+                                            {!habit.skippable && <span className="text-xs bg-yellow-900/40 text-yellow-400 px-1.5 py-0.5 rounded">no-skip</span>}
+                                            {!habit.active && <span className="text-xs bg-[#333] text-gray-400 px-1.5 py-0.5 rounded">inactive</span>}
                                         </div>
-                                        <span className="text-xs text-gray-400">
-                                            {habit.frequency === 'daily'
-                                                ? 'Every day'
-                                                : habit.specific_days.map(d => DAY_LABELS[d]).join(', ')}
+                                        <span className="text-xs text-gray-500">
+                                            {habit.frequency === 'daily' ? 'Every day' : habit.specific_days.map(d => DAY_LABELS[d]).join(', ')}
                                         </span>
                                     </div>
                                     <div className="flex items-center gap-2 shrink-0">
-                                        <button
-                                            onClick={() => handleToggleSkippable(habit)}
-                                            className={`text-xs px-2 py-1 rounded ${
-                                                habit.skippable ? 'bg-green-50 text-green-700' : 'bg-stone-100 text-gray-400'
-                                            }`}
-                                            title={habit.skippable ? 'Skippable' : 'Not skippable'}
-                                        >
-                                            Skip
-                                        </button>
-                                        <button
-                                            onClick={() => handleToggleCritical(habit)}
-                                            className={`text-xs px-2 py-1 rounded ${
-                                                habit.critical ? 'bg-red-50 text-red-600' : 'bg-stone-100 text-gray-400'
-                                            }`}
-                                            title={habit.critical ? 'Critical' : 'Not critical'}
-                                        >
-                                            Crit
-                                        </button>
-                                        <button
-                                            onClick={() => handleToggleActive(habit)}
-                                            className={`text-xs px-2 py-1 rounded ${
-                                                habit.active ? 'bg-teal-50 text-teal-700' : 'bg-stone-100 text-gray-400'
-                                            }`}
-                                        >
-                                            {habit.active ? 'Active' : 'Off'}
-                                        </button>
-                                        <button
-                                            onClick={() => handleDeleteHabit(habit.id)}
-                                            className="text-red-400 hover:text-red-600 text-sm px-2 py-1"
-                                        >
-                                            Delete
-                                        </button>
+                                        <button onClick={() => handleToggleSkippable(habit)} className={`text-xs px-2 py-1 rounded ${habit.skippable ? 'bg-green-900/40 text-green-400' : 'bg-[#333] text-gray-400'}`} title={habit.skippable ? 'Skippable' : 'Not skippable'}>Skip</button>
+                                        <button onClick={() => handleToggleCritical(habit)} className={`text-xs px-2 py-1 rounded ${habit.critical ? 'bg-red-900/40 text-red-400' : 'bg-[#333] text-gray-400'}`} title={habit.critical ? 'Critical' : 'Not critical'}>Crit</button>
+                                        <button onClick={() => handleToggleActive(habit)} className={`text-xs px-2 py-1 rounded ${habit.active ? 'bg-teal-900/40 text-teal-400' : 'bg-[#333] text-gray-400'}`}>{habit.active ? 'Active' : 'Off'}</button>
+                                        <button onClick={() => handleDeleteHabit(habit.id)} className="text-red-400 hover:text-red-300 text-sm px-2 py-1">Delete</button>
                                     </div>
                                 </div>
                             ))}
@@ -336,82 +261,37 @@ export default function SettingsPage() {
 
                 {/* Skip Days Section */}
                 <div>
-                    <h2 className="text-xl font-bold text-gray-700 mb-4">Skip Days</h2>
+                    <h2 className="text-xl font-bold text-gray-300 mb-4">Skip Days</h2>
 
-                    {/* Add Form */}
-                    <form onSubmit={handleAddSkip} className="mb-6 p-4 bg-white rounded-lg border border-stone-200 shadow-sm space-y-4">
-                        <h3 className="text-lg font-bold text-gray-600">Add Skip Day</h3>
+                    <form onSubmit={handleAddSkip} className="mb-6 p-4 bg-[#242424] rounded-lg border border-[#333] space-y-4">
+                        <h3 className="text-lg font-bold text-gray-300">Add Skip Day</h3>
                         <div className="flex flex-col gap-3">
                             <div className="flex gap-2">
-                                <select
-                                    value={skipMonth}
-                                    onChange={(e) => {
-                                        const m = Number(e.target.value);
-                                        setSkipMonth(m);
-                                        const maxDay = daysInMonth(m, skipYear);
-                                        if (skipDay > maxDay) setSkipDay(maxDay);
-                                    }}
-                                    className="bg-white text-gray-800 px-3 py-2 rounded border border-stone-200 focus:border-teal-500 focus:outline-none flex-1"
-                                >
-                                    {MONTH_NAMES.map((name, i) => (
-                                        <option key={i} value={i + 1}>{name}</option>
-                                    ))}
+                                <select value={skipMonth} onChange={(e) => { const m = Number(e.target.value); setSkipMonth(m); const maxDay = daysInMonth(m, skipYear); if (skipDay > maxDay) setSkipDay(maxDay); }} className="bg-[#1a1a1a] text-[#ededed] px-3 py-2 rounded border border-[#333] focus:border-teal-500 focus:outline-none flex-1">
+                                    {MONTH_NAMES.map((name, i) => (<option key={i} value={i + 1}>{name}</option>))}
                                 </select>
-                                <select
-                                    value={skipDay}
-                                    onChange={(e) => setSkipDay(Number(e.target.value))}
-                                    className="bg-white text-gray-800 px-3 py-2 rounded border border-stone-200 focus:border-teal-500 focus:outline-none w-20"
-                                >
-                                    {Array.from({ length: daysInMonth(skipMonth, skipYear) }, (_, i) => (
-                                        <option key={i + 1} value={i + 1}>{i + 1}</option>
-                                    ))}
+                                <select value={skipDay} onChange={(e) => setSkipDay(Number(e.target.value))} className="bg-[#1a1a1a] text-[#ededed] px-3 py-2 rounded border border-[#333] focus:border-teal-500 focus:outline-none w-20">
+                                    {Array.from({ length: daysInMonth(skipMonth, skipYear) }, (_, i) => (<option key={i + 1} value={i + 1}>{i + 1}</option>))}
                                 </select>
-                                <select
-                                    value={skipYear}
-                                    onChange={(e) => {
-                                        const y = Number(e.target.value);
-                                        setSkipYear(y);
-                                        const maxDay = daysInMonth(skipMonth, y);
-                                        if (skipDay > maxDay) setSkipDay(maxDay);
-                                    }}
-                                    className="bg-white text-gray-800 px-3 py-2 rounded border border-stone-200 focus:border-teal-500 focus:outline-none w-24"
-                                >
-                                    {[skipYear - 1, skipYear, skipYear + 1, skipYear + 2].map(y => (
-                                        <option key={y} value={y}>{y}</option>
-                                    ))}
+                                <select value={skipYear} onChange={(e) => { const y = Number(e.target.value); setSkipYear(y); const maxDay = daysInMonth(skipMonth, y); if (skipDay > maxDay) setSkipDay(maxDay); }} className="bg-[#1a1a1a] text-[#ededed] px-3 py-2 rounded border border-[#333] focus:border-teal-500 focus:outline-none w-24">
+                                    {[skipYear - 1, skipYear, skipYear + 1, skipYear + 2].map(y => (<option key={y} value={y}>{y}</option>))}
                                 </select>
                             </div>
                             <div className="flex gap-3">
-                                <select
-                                    value={reason}
-                                    onChange={(e) => setReason(e.target.value)}
-                                    className="bg-white text-gray-800 px-4 py-2 rounded border border-stone-200 focus:border-teal-500 focus:outline-none flex-1"
-                                >
-                                    {REASON_OPTIONS.map(r => (
-                                        <option key={r} value={r}>{r}</option>
-                                    ))}
+                                <select value={reason} onChange={(e) => setReason(e.target.value)} className="bg-[#1a1a1a] text-[#ededed] px-4 py-2 rounded border border-[#333] focus:border-teal-500 focus:outline-none flex-1">
+                                    {REASON_OPTIONS.map(r => (<option key={r} value={r}>{r}</option>))}
                                 </select>
-                                <button
-                                    type="submit"
-                                    disabled={submittingSkip}
-                                    className="px-6 py-2 rounded bg-teal-600 hover:bg-teal-700 text-white font-bold disabled:opacity-50"
-                                >
+                                <button type="submit" disabled={submittingSkip} className="px-6 py-2 rounded bg-teal-600 hover:bg-teal-700 text-white font-bold disabled:opacity-50">
                                     {submittingSkip ? 'Adding...' : 'Add'}
                                 </button>
                             </div>
                         </div>
-                        <label className="flex items-center gap-2 text-sm text-gray-500">
-                            <input
-                                type="checkbox"
-                                checked={autoRecovery}
-                                onChange={(e) => setAutoRecovery(e.target.checked)}
-                                className="accent-teal-600"
-                            />
+                        <label className="flex items-center gap-2 text-sm text-gray-400">
+                            <input type="checkbox" checked={autoRecovery} onChange={(e) => setAutoRecovery(e.target.checked)} className="accent-teal-500" />
                             Also add next day as recovery day
                         </label>
                     </form>
 
-                    {/* Skip Days List */}
                     {skipLoading ? (
                         <p className="text-center text-gray-400">Loading skip days...</p>
                     ) : skipDays.length === 0 ? (
@@ -419,33 +299,21 @@ export default function SettingsPage() {
                     ) : (
                         <div className="space-y-2">
                             {skipDays.map((day) => (
-                                <div
-                                    key={day.id}
-                                    className="bg-white px-4 py-3 rounded-lg border border-stone-200 shadow-sm flex items-center justify-between"
-                                >
+                                <div key={day.id} className="bg-[#242424] px-4 py-3 rounded-lg border border-[#333] flex items-center justify-between">
                                     <div className="flex items-center gap-3">
                                         <span className="text-sm text-gray-400 font-mono">{day.date}</span>
-                                        <span className="text-gray-800">{formatDate(day.date)}</span>
+                                        <span className="text-[#ededed]">{formatDate(day.date)}</span>
                                         <span className={`text-xs px-2 py-0.5 rounded ${
-                                            day.reason === 'Wedding' ? 'bg-yellow-50 text-yellow-700' :
-                                            day.reason === 'Bridal Show' ? 'bg-purple-50 text-purple-700' :
-                                            day.reason === 'Recovery' ? 'bg-blue-50 text-blue-700' :
-                                            'bg-stone-100 text-gray-500'
-                                        }`}>
-                                            {day.reason}
-                                        </span>
+                                            day.reason === 'Wedding' ? 'bg-yellow-900/40 text-yellow-400' :
+                                            day.reason === 'Bridal Show' ? 'bg-purple-900/40 text-purple-400' :
+                                            day.reason === 'Recovery' ? 'bg-blue-900/40 text-blue-400' :
+                                            'bg-[#333] text-gray-400'
+                                        }`}>{day.reason}</span>
                                         {day.auto_recovery && (
-                                            <span className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded">
-                                                +recovery
-                                            </span>
+                                            <span className="text-xs bg-blue-900/40 text-blue-400 px-2 py-0.5 rounded">+recovery</span>
                                         )}
                                     </div>
-                                    <button
-                                        onClick={() => handleDeleteSkip(day.id)}
-                                        className="text-red-400 hover:text-red-600 text-sm px-2 py-1"
-                                    >
-                                        Delete
-                                    </button>
+                                    <button onClick={() => handleDeleteSkip(day.id)} className="text-red-400 hover:text-red-300 text-sm px-2 py-1">Delete</button>
                                 </div>
                             ))}
                         </div>

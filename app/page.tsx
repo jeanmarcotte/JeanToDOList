@@ -203,14 +203,13 @@ export default function Home() {
     const sortTasks = (a: Task, b: Task) => {
         const priDiff = (priorityOrder[a.priority] ?? 1) - (priorityOrder[b.priority] ?? 1);
         if (priDiff !== 0) return priDiff;
-        // Within same priority: tasks with due dates first, earlier dates first
         if (a.due_date && !b.due_date) return -1;
         if (!a.due_date && b.due_date) return 1;
         if (a.due_date && b.due_date) return a.due_date.localeCompare(b.due_date);
         return 0;
     };
 
-    const todayStr = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Toronto' }); // YYYY-MM-DD
+    const todayStr = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Toronto' });
 
     const filterTasks = (list: Task[]) => {
         let filtered = list;
@@ -230,25 +229,25 @@ export default function Home() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-stone-50 text-gray-800 flex items-center justify-center">
+            <div className="min-h-screen bg-[#1a1a1a] text-[#ededed] flex items-center justify-center">
                 <p className="text-xl">Loading tasks...</p>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-stone-50 text-gray-800 p-4">
+        <div className="min-h-screen bg-[#1a1a1a] text-[#ededed] p-4">
             <div className="max-w-2xl mx-auto py-8">
                 <div className="flex items-center justify-center gap-3 mb-4">
                     <h1 className="text-6xl font-bold text-center">JeanToDoList</h1>
                     <button
                         onClick={handlePrint}
-                        className="text-gray-400 hover:text-gray-800 transition-colors"
+                        className="text-gray-500 hover:text-white transition-colors"
                         title="Print Master List"
                     >
                         <Printer size={24} />
                     </button>
-                    <Link href="/settings" className="text-gray-400 hover:text-gray-800 transition-colors" title="Settings">
+                    <Link href="/settings" className="text-gray-500 hover:text-white transition-colors" title="Settings">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
                             <circle cx="12" cy="12" r="3"/>
@@ -259,12 +258,11 @@ export default function Home() {
                 <p className="hidden sm:block text-lg text-gray-400 mb-6 text-center">
                     {torontoTime ? `${torontoTime} Toronto Time` : '\u00A0'}
                     {skipDayReason === 'Wedding' && (
-                        <span className="ml-2 text-yellow-600 font-bold">Wedding Day!</span>
+                        <span className="ml-2 text-yellow-300 font-bold">Wedding Day!</span>
                     )}
                 </p>
-                {/* Wedding Day indicator still shows on mobile */}
                 {skipDayReason === 'Wedding' && (
-                    <p className="sm:hidden text-center text-yellow-600 font-bold mb-4">Wedding Day!</p>
+                    <p className="sm:hidden text-center text-yellow-300 font-bold mb-4">Wedding Day!</p>
                 )}
 
                 {/* Priorities & Goals Row */}
@@ -274,13 +272,13 @@ export default function Home() {
                         className={`flex-1 px-4 py-2 rounded-md text-sm font-bold transition-colors relative ${
                             activeTab === 'priorities'
                                 ? 'bg-red-600 text-white'
-                                : 'bg-stone-200 text-gray-500 hover:text-gray-800'
+                                : 'bg-[#242424] text-gray-400 hover:text-white border border-[#333]'
                         }`}
                     >
                         Priorities
                         {priorityCount > 0 && (
                             <span className={`ml-1.5 inline-flex items-center justify-center w-5 h-5 text-xs rounded-full ${
-                                activeTab === 'priorities' ? 'bg-red-800 text-red-200' : 'bg-stone-300 text-gray-600'
+                                activeTab === 'priorities' ? 'bg-red-800 text-red-200' : 'bg-[#333] text-gray-300'
                             }`}>
                                 {priorityCount}
                             </span>
@@ -291,13 +289,13 @@ export default function Home() {
                         className={`flex-1 px-4 py-2 rounded-md text-sm font-bold transition-colors ${
                             activeTab === 'goals'
                                 ? 'bg-teal-600 text-white'
-                                : 'bg-stone-200 text-gray-500 hover:text-gray-800'
+                                : 'bg-[#242424] text-gray-400 hover:text-white border border-[#333]'
                         }`}
                     >
                         Goals
                         {goalCount > 0 && (
                             <span className={`ml-1.5 inline-flex items-center justify-center w-5 h-5 text-xs rounded-full ${
-                                activeTab === 'goals' ? 'bg-teal-800 text-teal-200' : 'bg-stone-300 text-gray-600'
+                                activeTab === 'goals' ? 'bg-teal-800 text-teal-200' : 'bg-[#333] text-gray-300'
                             }`}>
                                 {goalCount}
                             </span>
@@ -309,16 +307,16 @@ export default function Home() {
                 {(activeTab === 'tasks') && (
                     <div className="flex justify-center gap-6 mb-2 text-sm">
                         <div className="text-center">
-                            <div className="text-2xl font-bold text-teal-600">{activeTasks.length}</div>
+                            <div className="text-2xl font-bold text-teal-400">{activeTasks.length}</div>
                             <div className="text-gray-500">Active</div>
                         </div>
                         <div className="text-center">
-                            <div className="text-2xl font-bold text-green-500">{completedTasks.length}</div>
+                            <div className="text-2xl font-bold text-green-400">{completedTasks.length}</div>
                             <div className="text-gray-500">Completed</div>
                         </div>
                         {deletedTasks.length > 0 && (
                             <div className="text-center">
-                                <div className="text-2xl font-bold text-red-500">{deletedTasks.length}</div>
+                                <div className="text-2xl font-bold text-red-400">{deletedTasks.length}</div>
                                 <div className="text-gray-500">Deleted</div>
                             </div>
                         )}
@@ -326,13 +324,13 @@ export default function Home() {
                 )}
 
                 {/* Tab Bar */}
-                <div className="flex justify-center gap-1 mb-8 bg-stone-200 rounded-lg p-1 max-w-sm mx-auto">
+                <div className="flex justify-center gap-1 mb-8 bg-[#242424] rounded-lg p-1 max-w-sm mx-auto border border-[#333]">
                     <button
                         onClick={() => setActiveTab('tasks')}
                         className={`flex-1 px-4 py-2 rounded-md text-sm font-bold transition-colors ${
                             activeTab === 'tasks'
                                 ? 'bg-teal-600 text-white'
-                                : 'text-gray-500 hover:text-gray-800'
+                                : 'text-gray-400 hover:text-white'
                         }`}
                     >
                         Tasks
@@ -342,7 +340,7 @@ export default function Home() {
                         className={`flex-1 px-4 py-2 rounded-md text-sm font-bold transition-colors ${
                             activeTab === 'buy'
                                 ? 'bg-orange-600 text-white'
-                                : 'text-gray-500 hover:text-gray-800'
+                                : 'text-gray-400 hover:text-white'
                         }`}
                     >
                         Buy
@@ -352,7 +350,7 @@ export default function Home() {
                         className={`flex-1 px-4 py-2 rounded-md text-sm font-bold transition-colors ${
                             activeTab === 'stakes'
                                 ? 'bg-purple-600 text-white'
-                                : 'text-gray-500 hover:text-gray-800'
+                                : 'text-gray-400 hover:text-white'
                         }`}
                     >
                         Stakes
@@ -362,7 +360,7 @@ export default function Home() {
                         className={`flex-1 px-4 py-2 rounded-md text-sm font-bold transition-colors ${
                             activeTab === 'habits'
                                 ? 'bg-green-600 text-white'
-                                : 'text-gray-500 hover:text-gray-800'
+                                : 'text-gray-400 hover:text-white'
                         }`}
                     >
                         Habits
@@ -384,7 +382,7 @@ export default function Home() {
                                 onChange={(e) => setTaskInput(e.target.value)}
                                 onKeyDown={handleKeyDown}
                                 placeholder="What needs to get done?"
-                                className="flex-1 bg-white text-gray-800 text-lg px-6 py-4 rounded-lg border border-stone-200 focus:border-teal-500 focus:outline-none shadow-sm"
+                                className="flex-1 bg-[#242424] text-[#ededed] text-lg px-6 py-4 rounded-lg border border-[#333] focus:border-teal-500 focus:outline-none"
                             />
                             <button
                                 onClick={handleAddTask}
@@ -397,7 +395,7 @@ export default function Home() {
                             <select
                                 value={newPriority}
                                 onChange={(e) => setNewPriority(e.target.value as Priority)}
-                                className="bg-white text-gray-800 text-sm px-3 py-2 rounded-lg border border-stone-200 focus:border-teal-500 focus:outline-none"
+                                className="bg-[#242424] text-[#ededed] text-sm px-3 py-2 rounded-lg border border-[#333] focus:border-teal-500 focus:outline-none"
                             >
                                 <option value="high">High</option>
                                 <option value="medium">Medium</option>
@@ -406,7 +404,7 @@ export default function Home() {
                             <select
                                 value={newCategory}
                                 onChange={(e) => setNewCategory(e.target.value as Category | '')}
-                                className="bg-white text-gray-800 text-sm px-3 py-2 rounded-lg border border-stone-200 focus:border-teal-500 focus:outline-none"
+                                className="bg-[#242424] text-[#ededed] text-sm px-3 py-2 rounded-lg border border-[#333] focus:border-teal-500 focus:outline-none"
                             >
                                 <option value="">No category</option>
                                 {CATEGORIES.map(c => (
@@ -417,7 +415,8 @@ export default function Home() {
                                 type="date"
                                 value={newDueDate}
                                 onChange={(e) => setNewDueDate(e.target.value)}
-                                className="bg-white text-gray-800 text-sm px-3 py-2 rounded-lg border border-stone-200 focus:border-teal-500 focus:outline-none"
+                                className="bg-[#242424] text-[#ededed] text-sm px-3 py-2 rounded-lg border border-[#333] focus:border-teal-500 focus:outline-none"
+                                style={{ colorScheme: 'dark' }}
                                 placeholder="Due date"
                             />
                         </div>
@@ -436,7 +435,7 @@ export default function Home() {
                                                 : p === 'medium' ? 'bg-yellow-600 text-white'
                                                     : p === 'low' ? 'bg-gray-600 text-white'
                                                         : 'bg-teal-600 text-white'
-                                            : 'bg-stone-200 text-gray-500 hover:text-gray-800'
+                                            : 'bg-[#242424] text-gray-400 hover:text-white border border-[#333]'
                                     }`}
                                 >
                                     {p === 'all' ? 'All' : p.charAt(0).toUpperCase() + p.slice(1)}
@@ -446,7 +445,7 @@ export default function Home() {
                         <select
                             value={filterCategory}
                             onChange={(e) => setFilterCategory(e.target.value as Category | 'all')}
-                            className="bg-stone-200 text-gray-500 text-xs px-3 py-1 rounded-full border-none focus:outline-none"
+                            className="bg-[#242424] text-gray-400 text-xs px-3 py-1 rounded-full border border-[#333] focus:outline-none"
                         >
                             <option value="all">All categories</option>
                             {CATEGORIES.map(c => (
@@ -457,21 +456,21 @@ export default function Home() {
 
                     {/* Celebration Message */}
                     {tasks.length > 0 && activeTasks.length === 0 && (
-                        <div className="mb-8 p-6 bg-green-50 border-2 border-green-500 rounded-lg text-center">
-                            <p className="text-2xl font-bold text-green-600">All tasks complete!</p>
-                            <p className="text-green-600 mt-2">You crushed it today.</p>
+                        <div className="mb-8 p-6 bg-green-900/20 border-2 border-green-600 rounded-lg text-center">
+                            <p className="text-2xl font-bold text-green-400">All tasks complete!</p>
+                            <p className="text-green-300 mt-2">You crushed it today.</p>
                         </div>
                     )}
 
                     {/* Active Tasks */}
                     {activeTasks.length > 0 && (
                         <div className="mb-8">
-                            <h2 className="text-xl font-bold mb-4 text-gray-500">Active Tasks</h2>
+                            <h2 className="text-xl font-bold mb-4 text-gray-400">Active Tasks</h2>
                             <div className="space-y-3">
                                 {activeTasks.map((task) => (
                                     <div
                                         key={task.id}
-                                        className={`bg-white px-6 py-4 rounded-lg border border-stone-200 shadow-sm flex items-center justify-between ${
+                                        className={`bg-[#242424] px-6 py-4 rounded-lg border border-[#333] flex items-center justify-between ${
                                             task.priority === 'high' ? 'border-l-4 border-l-red-500'
                                                 : task.priority === 'medium' ? 'border-l-4 border-l-yellow-500'
                                                     : ''
@@ -480,17 +479,17 @@ export default function Home() {
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-center gap-2 flex-wrap">
                                                 <p
-                                                    className="text-lg break-words line-clamp-2 cursor-pointer hover:text-teal-600 transition-colors"
+                                                    className="text-lg break-words line-clamp-2 cursor-pointer hover:text-teal-400 transition-colors"
                                                     onClick={() => setSelectedTask(task)}
                                                 >
                                                     {task.title}
                                                 </p>
                                                 {task.category && (
-                                                    <span className="text-xs px-2 py-0.5 rounded-full bg-stone-100 text-gray-500">{task.category}</span>
+                                                    <span className="text-xs px-2 py-0.5 rounded-full bg-[#333] text-gray-400">{task.category}</span>
                                                 )}
                                                 {task.due_date && (
                                                     <span className={`text-xs px-2 py-0.5 rounded-full ${
-                                                        isOverdue(task.due_date) ? 'bg-red-50 text-red-600' : 'bg-stone-100 text-gray-500'
+                                                        isOverdue(task.due_date) ? 'bg-red-900/40 text-red-400' : 'bg-[#333] text-gray-400'
                                                     }`}>{formatDueDate(task.due_date)}</span>
                                                 )}
                                             </div>
@@ -504,7 +503,7 @@ export default function Home() {
                                             </button>
                                             <button
                                                 onClick={() => handleDeleteTask(task.id)}
-                                                className="px-4 py-2 rounded bg-red-100 hover:bg-red-200 text-red-700 text-sm"
+                                                className="px-4 py-2 rounded bg-red-900/40 hover:bg-red-900/60 text-red-400 text-sm"
                                             >
                                                 Delete
                                             </button>
@@ -520,7 +519,7 @@ export default function Home() {
                         <div className="mb-8">
                             <button
                                 onClick={() => setShowCompleted(!showCompleted)}
-                                className="text-gray-500 hover:text-gray-700 text-sm font-bold mb-4"
+                                className="text-gray-400 hover:text-gray-300 text-sm font-bold mb-4"
                             >
                                 {showCompleted ? 'Hide' : 'Show'} completed ({completedTasks.length})
                             </button>
@@ -529,21 +528,21 @@ export default function Home() {
                                     {completedTasks.map((task) => (
                                         <div
                                             key={task.id}
-                                            className="bg-white px-6 py-4 rounded-lg border border-green-200 shadow-sm flex items-center justify-between opacity-60"
+                                            className="bg-[#242424] px-6 py-4 rounded-lg border border-green-900/50 flex items-center justify-between opacity-60"
                                         >
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-center gap-2 flex-wrap">
                                                     <p
-                                                        className="text-lg line-through text-gray-400 break-words line-clamp-2 cursor-pointer hover:text-gray-600 transition-colors"
+                                                        className="text-lg line-through text-gray-500 break-words line-clamp-2 cursor-pointer hover:text-gray-400 transition-colors"
                                                         onClick={() => setSelectedTask(task)}
                                                     >
                                                         {task.title}
                                                     </p>
                                                     {task.category && (
-                                                        <span className="text-xs px-2 py-0.5 rounded-full bg-stone-100 text-gray-400">{task.category}</span>
+                                                        <span className="text-xs px-2 py-0.5 rounded-full bg-[#333] text-gray-500">{task.category}</span>
                                                     )}
                                                     {task.due_date && (
-                                                        <span className="text-xs px-2 py-0.5 rounded-full bg-stone-100 text-gray-400">{formatDueDate(task.due_date)}</span>
+                                                        <span className="text-xs px-2 py-0.5 rounded-full bg-[#333] text-gray-500">{formatDueDate(task.due_date)}</span>
                                                     )}
                                                 </div>
                                             </div>
@@ -556,7 +555,7 @@ export default function Home() {
                                                 </button>
                                                 <button
                                                     onClick={() => handleDeleteTask(task.id)}
-                                                    className="px-4 py-2 rounded bg-red-100 hover:bg-red-200 text-red-700 text-sm"
+                                                    className="px-4 py-2 rounded bg-red-900/40 hover:bg-red-900/60 text-red-400 text-sm"
                                                 >
                                                     Delete
                                                 </button>
@@ -573,15 +572,15 @@ export default function Home() {
                         <div className="mt-6">
                             <button
                                 onClick={() => setShowShameLog(!showShameLog)}
-                                className="text-gray-400 text-sm hover:text-gray-600"
+                                className="text-gray-500 text-sm hover:text-gray-400"
                             >
                                 {showShameLog ? 'Hide' : 'Show'} Shame Log ({deletedTasks.length})
                             </button>
                             {showShameLog && (
-                                <div className="mt-3 p-4 bg-red-50 border border-red-200 rounded-lg">
-                                    <p className="text-red-600 font-bold mb-2">Tasks you gave up on:</p>
+                                <div className="mt-3 p-4 bg-red-900/20 border border-red-900/50 rounded-lg">
+                                    <p className="text-red-400 font-bold mb-2">Tasks you gave up on:</p>
                                     {deletedTasks.map((task, index) => (
-                                        <p key={index} className="text-red-500 text-sm">{task}</p>
+                                        <p key={index} className="text-red-300 text-sm">{task}</p>
                                     ))}
                                 </div>
                             )}
@@ -593,11 +592,11 @@ export default function Home() {
             {/* Task Detail Modal */}
             {selectedTask && (
                 <div
-                    className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50"
+                    className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50"
                     onClick={() => { setSelectedTask(null); setIsEditing(false); }}
                 >
                     <div
-                        className="bg-white rounded-lg border border-stone-200 shadow-lg max-w-lg w-full max-h-[80vh] overflow-y-auto"
+                        className="bg-[#242424] rounded-lg border border-[#333] max-w-lg w-full max-h-[80vh] overflow-y-auto"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="p-6">
@@ -612,11 +611,11 @@ export default function Home() {
                                                 <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-600 text-white">Medium</span>
                                             )}
                                             {selectedTask.category && (
-                                                <span className="text-xs px-2 py-0.5 rounded-full bg-stone-100 text-gray-500">{selectedTask.category}</span>
+                                                <span className="text-xs px-2 py-0.5 rounded-full bg-[#333] text-gray-400">{selectedTask.category}</span>
                                             )}
                                             {selectedTask.due_date && (
                                                 <span className={`text-xs px-2 py-0.5 rounded-full ${
-                                                    selectedTask.due_date < todayStr ? 'bg-red-50 text-red-600' : 'bg-stone-100 text-gray-500'
+                                                    selectedTask.due_date < todayStr ? 'bg-red-900/40 text-red-400' : 'bg-[#333] text-gray-400'
                                                 }`}>{formatDueDate(selectedTask.due_date)}</span>
                                             )}
                                         </>
@@ -624,7 +623,7 @@ export default function Home() {
                                 </div>
                                 <button
                                     onClick={() => { setSelectedTask(null); setIsEditing(false); }}
-                                    className="text-gray-400 hover:text-gray-800 text-2xl leading-none"
+                                    className="text-gray-500 hover:text-white text-2xl leading-none"
                                 >
                                     ×
                                 </button>
@@ -635,7 +634,7 @@ export default function Home() {
                                     <textarea
                                         value={editTitle}
                                         onChange={(e) => setEditTitle(e.target.value)}
-                                        className="w-full bg-white text-gray-800 text-lg px-4 py-3 rounded-lg border-2 border-teal-500 focus:outline-none mb-4 resize-none"
+                                        className="w-full bg-[#1a1a1a] text-[#ededed] text-lg px-4 py-3 rounded-lg border-2 border-teal-500 focus:outline-none mb-4 resize-none"
                                         rows={3}
                                         autoFocus
                                     />
@@ -643,7 +642,7 @@ export default function Home() {
                                         <select
                                             value={editPriority}
                                             onChange={(e) => setEditPriority(e.target.value as Priority)}
-                                            className="bg-white text-gray-800 text-sm px-3 py-2 rounded-lg border border-stone-200 focus:border-teal-500 focus:outline-none"
+                                            className="bg-[#1a1a1a] text-[#ededed] text-sm px-3 py-2 rounded-lg border border-[#333] focus:border-teal-500 focus:outline-none"
                                         >
                                             <option value="high">High</option>
                                             <option value="medium">Medium</option>
@@ -652,7 +651,7 @@ export default function Home() {
                                         <select
                                             value={editCategory}
                                             onChange={(e) => setEditCategory(e.target.value as Category | '')}
-                                            className="bg-white text-gray-800 text-sm px-3 py-2 rounded-lg border border-stone-200 focus:border-teal-500 focus:outline-none"
+                                            className="bg-[#1a1a1a] text-[#ededed] text-sm px-3 py-2 rounded-lg border border-[#333] focus:border-teal-500 focus:outline-none"
                                         >
                                             <option value="">No category</option>
                                             {CATEGORIES.map(c => (
@@ -663,7 +662,8 @@ export default function Home() {
                                             type="date"
                                             value={editDueDate}
                                             onChange={(e) => setEditDueDate(e.target.value)}
-                                            className="bg-white text-gray-800 text-sm px-3 py-2 rounded-lg border border-stone-200 focus:border-teal-500 focus:outline-none"
+                                            className="bg-[#1a1a1a] text-[#ededed] text-sm px-3 py-2 rounded-lg border border-[#333] focus:border-teal-500 focus:outline-none"
+                                            style={{ colorScheme: 'dark' }}
                                         />
                                     </div>
                                     <div className="flex gap-2">
@@ -688,7 +688,7 @@ export default function Home() {
                                         </button>
                                         <button
                                             onClick={() => setIsEditing(false)}
-                                            className="px-4 py-3 rounded bg-stone-200 hover:bg-stone-300 text-gray-700"
+                                            className="px-4 py-3 rounded bg-[#333] hover:bg-[#444] text-gray-300"
                                         >
                                             Cancel
                                         </button>
@@ -696,7 +696,7 @@ export default function Home() {
                                 </>
                             ) : (
                                 <>
-                                    <p className="text-xl text-gray-800 leading-relaxed mb-6">{selectedTask.title}</p>
+                                    <p className="text-xl text-[#ededed] leading-relaxed mb-6">{selectedTask.title}</p>
 
                                     <div className="flex gap-2">
                                         <button
@@ -716,10 +716,10 @@ export default function Home() {
                                                 toggleComplete(selectedTask.id);
                                                 setSelectedTask(null);
                                             }}
-                                            className={`flex-1 px-4 py-3 rounded font-bold ${
+                                            className={`flex-1 px-4 py-3 rounded font-bold text-white ${
                                                 selectedTask.completed
-                                                    ? 'bg-green-600 hover:bg-green-700 text-white'
-                                                    : 'bg-teal-600 hover:bg-teal-700 text-white'
+                                                    ? 'bg-green-600 hover:bg-green-700'
+                                                    : 'bg-teal-600 hover:bg-teal-700'
                                             }`}
                                         >
                                             {selectedTask.completed ? 'Done' : 'Complete'}
@@ -729,7 +729,7 @@ export default function Home() {
                                                 handleDeleteTask(selectedTask.id);
                                                 setSelectedTask(null);
                                             }}
-                                            className="px-4 py-3 rounded bg-red-100 hover:bg-red-200 text-red-700"
+                                            className="px-4 py-3 rounded bg-red-900/40 hover:bg-red-900/60 text-red-400"
                                         >
                                             Delete
                                         </button>
