@@ -94,7 +94,7 @@ export default function PrioritiesTab() {
     };
 
     if (loading) {
-        return <p className="text-center text-gray-500">Loading priorities...</p>;
+        return <p className="text-center text-gray-400">Loading priorities...</p>;
     }
 
     return (
@@ -116,7 +116,7 @@ export default function PrioritiesTab() {
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={handleKeyDown}
                         placeholder="What's the priority right now?"
-                        className="flex-1 bg-gray-900 text-white text-lg px-6 py-4 rounded-lg border-2 border-gray-700 focus:border-red-500 focus:outline-none"
+                        className="flex-1 bg-white text-gray-800 text-lg px-6 py-4 rounded-lg border border-stone-200 focus:border-red-500 focus:outline-none shadow-sm"
                     />
                     <button
                         onClick={handleAdd}
@@ -135,32 +135,32 @@ export default function PrioritiesTab() {
                         className={`text-sm px-3 py-1 rounded-full transition-colors ${
                             reordering
                                 ? 'bg-red-600 text-white'
-                                : 'bg-gray-800 text-gray-400 hover:text-white'
+                                : 'bg-stone-200 text-gray-500 hover:text-gray-800'
                         }`}
                     >
-                        {reordering ? '✓ Done Reordering' : '↕ Reorder'}
+                        {reordering ? 'Done Reordering' : 'Reorder'}
                     </button>
                 </div>
             )}
 
             {/* Priority List */}
             {priorities.length === 0 ? (
-                <p className="text-gray-600 text-center py-8">No priorities set. What matters right now?</p>
+                <p className="text-gray-400 text-center py-8">No priorities set. What matters right now?</p>
             ) : (
                 <div className="space-y-3 mb-8">
                     {priorities.map((priority, index) => (
                         <div
                             key={priority.id}
-                            className={`bg-gray-900 rounded-lg p-4 border-l-4 ${
-                                index === 0 ? 'border-l-red-500' : 'border-l-gray-600'
+                            className={`bg-white rounded-lg p-4 border-l-4 border border-stone-200 shadow-sm ${
+                                index === 0 ? 'border-l-red-500' : 'border-l-stone-300'
                             }`}
                         >
                             <div className="flex items-center justify-between gap-3">
                                 <div className="flex items-center gap-3 flex-1 min-w-0">
-                                    <span className="text-gray-500 font-bold text-sm shrink-0">
+                                    <span className="text-gray-400 font-bold text-sm shrink-0">
                                         #{index + 1}
                                     </span>
-                                    <p className="text-white font-medium line-clamp-2">{priority.title}</p>
+                                    <p className="text-gray-800 font-medium line-clamp-2">{priority.title}</p>
                                 </div>
                                 <div className="flex gap-1 shrink-0">
                                     {reordering ? (
@@ -170,8 +170,8 @@ export default function PrioritiesTab() {
                                                 disabled={index === 0}
                                                 className={`px-2 py-2 rounded text-sm ${
                                                     index === 0
-                                                        ? 'bg-gray-800 text-gray-600 cursor-not-allowed'
-                                                        : 'bg-gray-700 hover:bg-gray-600 text-white'
+                                                        ? 'bg-stone-100 text-gray-300 cursor-not-allowed'
+                                                        : 'bg-stone-200 hover:bg-stone-300 text-gray-700'
                                                 }`}
                                             >
                                                 ▲
@@ -181,8 +181,8 @@ export default function PrioritiesTab() {
                                                 disabled={index === priorities.length - 1}
                                                 className={`px-2 py-2 rounded text-sm ${
                                                     index === priorities.length - 1
-                                                        ? 'bg-gray-800 text-gray-600 cursor-not-allowed'
-                                                        : 'bg-gray-700 hover:bg-gray-600 text-white'
+                                                        ? 'bg-stone-100 text-gray-300 cursor-not-allowed'
+                                                        : 'bg-stone-200 hover:bg-stone-300 text-gray-700'
                                                 }`}
                                             >
                                                 ▼
@@ -199,14 +199,14 @@ export default function PrioritiesTab() {
                                             </button>
                                             <button
                                                 onClick={() => handleMoveToBottom(priority.id)}
-                                                className="px-3 py-2 bg-gray-700 hover:bg-gray-600 rounded text-white text-sm font-bold"
+                                                className="px-3 py-2 bg-stone-200 hover:bg-stone-300 rounded text-gray-700 text-sm font-bold"
                                                 title="Move to bottom"
                                             >
                                                 ⬇
                                             </button>
                                             <button
                                                 onClick={() => handleDismiss(priority.id)}
-                                                className="px-3 py-2 bg-red-900 hover:bg-red-800 rounded text-white text-sm font-bold"
+                                                className="px-3 py-2 bg-red-100 hover:bg-red-200 rounded text-red-700 text-sm font-bold"
                                                 title="Not relevant"
                                             >
                                                 ✕

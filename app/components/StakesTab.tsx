@@ -64,20 +64,20 @@ function StakeCard({
 
     return (
         <div
-            className={`bg-gray-900 p-5 rounded-lg border-2 ${
+            className={`bg-white p-5 rounded-lg border shadow-sm ${
                 isAbandoned
-                    ? 'border-gray-600'
+                    ? 'border-stone-300'
                     : isWon
-                      ? 'border-green-600'
+                      ? 'border-green-500'
                       : isLost
-                        ? 'border-red-600'
-                        : 'border-gray-700'
+                        ? 'border-red-500'
+                        : 'border-stone-200'
             } ${isPast ? 'opacity-70' : ''}`}
         >
             <div className="flex items-center justify-between mb-1">
                 <div>
                     <div className="flex items-center gap-2">
-                        <h3 className={`text-lg font-bold ${isAbandoned ? 'line-through text-gray-500' : ''}`}>
+                        <h3 className={`text-lg font-bold ${isAbandoned ? 'line-through text-gray-400' : 'text-gray-800'}`}>
                             {stake.title}
                         </h3>
                         {isAbandoned && (
@@ -86,20 +86,20 @@ function StakeCard({
                             </span>
                         )}
                         {!isAbandoned && isWon && (
-                            <span className="text-green-400 font-bold text-sm animate-pulse">
+                            <span className="text-green-600 font-bold text-sm animate-pulse">
                                 WON
                             </span>
                         )}
                         {!isAbandoned && isLost && (
-                            <span className="text-red-400 font-bold text-sm">
+                            <span className="text-red-600 font-bold text-sm">
                                 LOST
                             </span>
                         )}
                     </div>
-                    <p className="text-sm text-gray-400">
+                    <p className="text-sm text-gray-500">
                         {stake.current_value} / {stake.target_count}
                         {stake.deadline && (
-                            <span className={isOverdue ? 'text-red-400 ml-2' : 'ml-2'}>
+                            <span className={isOverdue ? 'text-red-500 ml-2' : 'ml-2'}>
                                 &middot; Due {new Date(stake.deadline).toLocaleDateString()}
                             </span>
                         )}
@@ -110,13 +110,13 @@ function StakeCard({
                         <>
                             <button
                                 onClick={() => onAbandon(stake.id)}
-                                className="px-3 py-2 rounded text-gray-500 hover:text-red-400 hover:bg-gray-800 text-xs transition-colors"
+                                className="px-3 py-2 rounded text-gray-400 hover:text-red-500 hover:bg-stone-100 text-xs transition-colors"
                             >
                                 Abandon
                             </button>
                             <button
                                 onClick={() => onCheckIn(stake.id)}
-                                className="px-4 py-2 rounded bg-purple-600 hover:bg-purple-700 font-bold text-sm"
+                                className="px-4 py-2 rounded bg-purple-600 hover:bg-purple-700 text-white font-bold text-sm"
                             >
                                 Check In
                             </button>
@@ -125,7 +125,7 @@ function StakeCard({
                     {!isPast && isWon && (
                         <button
                             onClick={() => onClaimVictory(stake.id)}
-                            className="px-4 py-2 rounded bg-green-600 hover:bg-green-700 font-bold text-sm"
+                            className="px-4 py-2 rounded bg-green-600 hover:bg-green-700 text-white font-bold text-sm"
                         >
                             Claim Victory
                         </button>
@@ -133,7 +133,7 @@ function StakeCard({
                     {!isPast && isLost && (
                         <button
                             onClick={() => onAcceptDefeat(stake.id)}
-                            className="px-4 py-2 rounded bg-red-600 hover:bg-red-700 font-bold text-sm"
+                            className="px-4 py-2 rounded bg-red-600 hover:bg-red-700 text-white font-bold text-sm"
                         >
                             Accept Defeat
                         </button>
@@ -145,20 +145,20 @@ function StakeCard({
             {(stake.reward || stake.consequence) && (
                 <div className="flex gap-4 mb-2 text-xs">
                     {stake.reward && (
-                        <span className="text-green-400">Reward: {stake.reward}</span>
+                        <span className="text-green-600">Reward: {stake.reward}</span>
                     )}
                     {stake.consequence && (
-                        <span className="text-red-400">Consequence: {stake.consequence}</span>
+                        <span className="text-red-600">Consequence: {stake.consequence}</span>
                     )}
                 </div>
             )}
 
             {/* Progress Bar */}
-            <div className="w-full bg-gray-800 rounded-full h-3 overflow-hidden">
+            <div className="w-full bg-stone-200 rounded-full h-3 overflow-hidden">
                 <div
                     className={`h-full rounded-full transition-all duration-500 ${
                         isAbandoned
-                            ? 'bg-gray-600'
+                            ? 'bg-gray-400'
                             : isWon
                               ? 'bg-green-500'
                               : isOverdue
@@ -168,13 +168,13 @@ function StakeCard({
                     style={{ width: `${percent}%` }}
                 />
             </div>
-            <p className="text-right text-xs text-gray-500 mt-1">{percent}%</p>
+            <p className="text-right text-xs text-gray-400 mt-1">{percent}%</p>
 
             {/* Entry Log Toggle */}
             {stake.entry_count > 0 && (
                 <button
                     onClick={() => onToggleEntryLog(stake.id)}
-                    className="text-xs text-gray-500 hover:text-purple-400 mt-1 transition-colors"
+                    className="text-xs text-gray-400 hover:text-purple-600 mt-1 transition-colors"
                 >
                     {isExpanded ? 'Hide check-ins' : `Show check-ins (${stake.entry_count})`}
                 </button>
@@ -184,28 +184,28 @@ function StakeCard({
             {isExpanded && (
                 <div className="mt-3 space-y-2">
                     {loadingEntries === stake.id ? (
-                        <p className="text-xs text-gray-500">Loading...</p>
+                        <p className="text-xs text-gray-400">Loading...</p>
                     ) : entries && entries.length > 0 ? (
                         entries.map((entry) => (
                             <div
                                 key={entry.id}
-                                className="bg-gray-800 rounded px-3 py-2 text-sm flex items-center justify-between"
+                                className="bg-stone-50 rounded px-3 py-2 text-sm flex items-center justify-between"
                             >
-                                <div className="text-gray-300">
+                                <div className="text-gray-700">
                                     {entry.amount != null && (
-                                        <span className="text-purple-400 font-semibold mr-2">
+                                        <span className="text-purple-600 font-semibold mr-2">
                                             {entry.amount}
                                         </span>
                                     )}
-                                    {entry.note || <span className="text-gray-600 italic">No note</span>}
+                                    {entry.note || <span className="text-gray-400 italic">No note</span>}
                                 </div>
-                                <span className="text-xs text-gray-500 ml-3 shrink-0">
+                                <span className="text-xs text-gray-400 ml-3 shrink-0">
                                     {new Date(entry.created_at).toLocaleDateString()}
                                 </span>
                             </div>
                         ))
                     ) : (
-                        <p className="text-xs text-gray-500">No entries yet.</p>
+                        <p className="text-xs text-gray-400">No entries yet.</p>
                     )}
                 </div>
             )}
@@ -486,20 +486,20 @@ export default function StakesTab() {
             {!showForm ? (
                 <button
                     onClick={() => setShowForm(true)}
-                    className="w-full bg-gray-900 text-gray-400 text-lg px-6 py-4 rounded-lg border-2 border-dashed border-gray-700 hover:border-purple-500 hover:text-purple-400 mb-8 transition-colors"
+                    className="w-full bg-white text-gray-400 text-lg px-6 py-4 rounded-lg border-2 border-dashed border-stone-300 hover:border-purple-500 hover:text-purple-600 mb-8 transition-colors"
                 >
                     + New Stake
                 </button>
             ) : (
-                <div className="bg-gray-900 p-6 rounded-lg border-2 border-purple-700 mb-8">
-                    <h3 className="text-lg font-bold text-purple-400 mb-4">Create a Stake</h3>
+                <div className="bg-white p-6 rounded-lg border-2 border-purple-400 shadow-sm mb-8">
+                    <h3 className="text-lg font-bold text-purple-600 mb-4">Create a Stake</h3>
                     <div className="space-y-3">
                         <input
                             type="text"
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
                             placeholder="What's at stake? (e.g. Run 30 times)"
-                            className="w-full bg-black text-white px-4 py-3 rounded border border-gray-700 focus:border-purple-500 focus:outline-none"
+                            className="w-full bg-white text-gray-800 px-4 py-3 rounded border border-stone-200 focus:border-purple-500 focus:outline-none"
                         />
                         <input
                             type="number"
@@ -507,32 +507,32 @@ export default function StakesTab() {
                             onChange={(e) => setTargetCount(e.target.value)}
                             placeholder="Target count (e.g. 30)"
                             min="1"
-                            className="w-full bg-black text-white px-4 py-3 rounded border border-gray-700 focus:border-purple-500 focus:outline-none"
+                            className="w-full bg-white text-gray-800 px-4 py-3 rounded border border-stone-200 focus:border-purple-500 focus:outline-none"
                         />
                         <input
                             type="date"
                             value={deadline}
                             onChange={(e) => setDeadline(e.target.value)}
-                            className="w-full bg-black text-white px-4 py-3 rounded border border-gray-700 focus:border-purple-500 focus:outline-none"
+                            className="w-full bg-white text-gray-800 px-4 py-3 rounded border border-stone-200 focus:border-purple-500 focus:outline-none"
                         />
                         <input
                             type="text"
                             value={reward}
                             onChange={(e) => setReward(e.target.value)}
                             placeholder="Reward (optional, e.g. Buy new shoes)"
-                            className="w-full bg-black text-white px-4 py-3 rounded border border-gray-700 focus:border-purple-500 focus:outline-none"
+                            className="w-full bg-white text-gray-800 px-4 py-3 rounded border border-stone-200 focus:border-purple-500 focus:outline-none"
                         />
                         <input
                             type="text"
                             value={consequence}
                             onChange={(e) => setConsequence(e.target.value)}
                             placeholder="Consequence (optional, e.g. Donate $50 to charity)"
-                            className="w-full bg-black text-white px-4 py-3 rounded border border-gray-700 focus:border-purple-500 focus:outline-none"
+                            className="w-full bg-white text-gray-800 px-4 py-3 rounded border border-stone-200 focus:border-purple-500 focus:outline-none"
                         />
                         <div className="flex gap-3 pt-2">
                             <button
                                 onClick={handleCreateStake}
-                                className="px-6 py-2 rounded bg-purple-600 hover:bg-purple-700 font-bold"
+                                className="px-6 py-2 rounded bg-purple-600 hover:bg-purple-700 text-white font-bold"
                             >
                                 Create
                             </button>
@@ -545,7 +545,7 @@ export default function StakesTab() {
                                     setReward('');
                                     setConsequence('');
                                 }}
-                                className="px-6 py-2 rounded bg-gray-700 hover:bg-gray-600"
+                                className="px-6 py-2 rounded bg-stone-200 hover:bg-stone-300 text-gray-700"
                             >
                                 Cancel
                             </button>
@@ -556,14 +556,14 @@ export default function StakesTab() {
 
             {/* Active Stakes */}
             {stakes.length === 0 && pastStakes.length === 0 ? (
-                <div className="text-center py-12 text-gray-500">
+                <div className="text-center py-12 text-gray-400">
                     <p className="text-lg">No active stakes yet.</p>
                     <p className="text-sm mt-2">Create one to start tracking your commitment.</p>
                 </div>
             ) : (
                 <>
                     {stakes.length === 0 && (
-                        <p className="text-gray-500 text-center py-6">No active stakes. Create one above!</p>
+                        <p className="text-gray-400 text-center py-6">No active stakes. Create one above!</p>
                     )}
                     <div className="space-y-4">
                         {stakes.map((stake) => (
@@ -586,7 +586,7 @@ export default function StakesTab() {
                     {/* Past Stakes */}
                     {pastStakes.length > 0 && (
                         <div className="mt-10">
-                            <h3 className="text-gray-500 font-bold text-sm uppercase tracking-wider mb-4">Past Stakes</h3>
+                            <h3 className="text-gray-400 font-bold text-sm uppercase tracking-wider mb-4">Past Stakes</h3>
                             <div className="space-y-4">
                                 {pastStakes.map((stake) => (
                                     <StakeCard
@@ -611,10 +611,10 @@ export default function StakesTab() {
 
             {/* Check-in Modal */}
             {checkInStakeId !== null && (
-                <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+                <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
                     <div className="bg-gradient-to-br from-purple-500 to-indigo-600 p-1 rounded-2xl">
-                        <div className="bg-gray-900 rounded-2xl p-6 w-80">
-                            <h3 className="text-lg font-bold text-purple-400 mb-4">Check In</h3>
+                        <div className="bg-white rounded-2xl p-6 w-80">
+                            <h3 className="text-lg font-bold text-purple-600 mb-4">Check In</h3>
                             <div className="space-y-3">
                                 <input
                                     type="number"
@@ -622,25 +622,25 @@ export default function StakesTab() {
                                     onChange={(e) => setCheckInAmount(e.target.value)}
                                     placeholder="Amount (optional, e.g. 3.5)"
                                     step="any"
-                                    className="w-full bg-black text-white px-4 py-3 rounded border border-gray-700 focus:border-purple-500 focus:outline-none"
+                                    className="w-full bg-white text-gray-800 px-4 py-3 rounded border border-stone-200 focus:border-purple-500 focus:outline-none"
                                 />
                                 <input
                                     type="text"
                                     value={checkInNote}
                                     onChange={(e) => setCheckInNote(e.target.value)}
                                     placeholder="Note (optional)"
-                                    className="w-full bg-black text-white px-4 py-3 rounded border border-gray-700 focus:border-purple-500 focus:outline-none"
+                                    className="w-full bg-white text-gray-800 px-4 py-3 rounded border border-stone-200 focus:border-purple-500 focus:outline-none"
                                 />
                                 <div className="flex gap-3 pt-2">
                                     <button
                                         onClick={handleCheckInSubmit}
-                                        className="px-6 py-2 rounded bg-purple-600 hover:bg-purple-700 font-bold"
+                                        className="px-6 py-2 rounded bg-purple-600 hover:bg-purple-700 text-white font-bold"
                                     >
                                         Submit
                                     </button>
                                     <button
                                         onClick={() => setCheckInStakeId(null)}
-                                        className="px-6 py-2 rounded bg-gray-700 hover:bg-gray-600"
+                                        className="px-6 py-2 rounded bg-stone-200 hover:bg-stone-300 text-gray-700"
                                     >
                                         Cancel
                                     </button>
@@ -653,19 +653,19 @@ export default function StakesTab() {
 
             {/* Abandon Confirmation Modal */}
             {abandonTarget && (
-                <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-                    <div className="bg-gradient-to-br from-red-800 to-gray-800 p-1 rounded-2xl">
-                        <div className="bg-gray-900 rounded-2xl p-6 w-96">
-                            <h3 className="text-lg font-bold text-red-400 mb-2">Abandon Stake?</h3>
-                            <p className="text-gray-400 text-sm mb-4">
-                                Type <span className="text-white font-bold">&ldquo;{abandonTarget.title}&rdquo;</span> to confirm you&apos;re giving up.
+                <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+                    <div className="bg-gradient-to-br from-red-500 to-gray-600 p-1 rounded-2xl">
+                        <div className="bg-white rounded-2xl p-6 w-96">
+                            <h3 className="text-lg font-bold text-red-600 mb-2">Abandon Stake?</h3>
+                            <p className="text-gray-500 text-sm mb-4">
+                                Type <span className="text-gray-800 font-bold">&ldquo;{abandonTarget.title}&rdquo;</span> to confirm you&apos;re giving up.
                             </p>
                             <input
                                 type="text"
                                 value={abandonConfirmText}
                                 onChange={(e) => setAbandonConfirmText(e.target.value)}
                                 placeholder="Type the stake title to confirm"
-                                className="w-full bg-black text-white px-4 py-3 rounded border border-gray-700 focus:border-red-500 focus:outline-none mb-4"
+                                className="w-full bg-white text-gray-800 px-4 py-3 rounded border border-stone-200 focus:border-red-500 focus:outline-none mb-4"
                                 autoFocus
                             />
                             <div className="flex gap-3">
@@ -675,14 +675,14 @@ export default function StakesTab() {
                                     className={`px-6 py-2 rounded font-bold text-sm ${
                                         abandonConfirmText === abandonTarget.title
                                             ? 'bg-red-600 hover:bg-red-700 text-white'
-                                            : 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                                            : 'bg-stone-200 text-gray-400 cursor-not-allowed'
                                     }`}
                                 >
                                     I Quit
                                 </button>
                                 <button
                                     onClick={() => setAbandonStakeId(null)}
-                                    className="px-6 py-2 rounded bg-gray-700 hover:bg-gray-600 font-bold text-sm"
+                                    className="px-6 py-2 rounded bg-stone-200 hover:bg-stone-300 text-gray-700 font-bold text-sm"
                                 >
                                     Never Mind
                                 </button>

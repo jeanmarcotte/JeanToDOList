@@ -78,7 +78,7 @@ export default function HabitsTab() {
         <div>
             {/* Streak toast */}
             {streakToast && (
-                <div className="fixed top-4 left-1/2 -translate-x-1/2 z-40 bg-green-800 text-green-100 px-6 py-3 rounded-lg shadow-lg animate-bounce">
+                <div className="fixed top-4 left-1/2 -translate-x-1/2 z-40 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg animate-bounce">
                     🔥 {streakToast.days}-day streak on &quot;{streakToast.habitLabel}&quot;!
                 </div>
             )}
@@ -101,17 +101,17 @@ export default function HabitsTab() {
             {/* Header */}
             <div className="flex items-center justify-center mb-6">
                 <div className="text-center">
-                    <span className="text-3xl font-bold text-green-400">
+                    <span className="text-3xl font-bold text-green-600">
                         {completedCount} / {totalCount}
                     </span>
-                    <p className="text-gray-500 text-sm mt-1">habits completed today</p>
+                    <p className="text-gray-400 text-sm mt-1">habits completed today</p>
                 </div>
             </div>
 
             {/* All done banner */}
             {allDone && (
-                <div className="mb-6 p-4 bg-green-900/20 border-2 border-green-600 rounded-lg text-center">
-                    <p className="text-xl font-bold text-green-400">All habits done for today!</p>
+                <div className="mb-6 p-4 bg-green-50 border-2 border-green-500 rounded-lg text-center">
+                    <p className="text-xl font-bold text-green-600">All habits done for today!</p>
                 </div>
             )}
 
@@ -124,12 +124,12 @@ export default function HabitsTab() {
                     return (
                         <div
                             key={habit.habit_key}
-                            className={`bg-gray-900 px-6 py-4 rounded-lg border-2 flex items-center gap-4 ${
+                            className={`bg-white px-6 py-4 rounded-lg border shadow-sm flex items-center gap-4 ${
                                 isCriticalIncomplete
                                     ? 'border-red-500'
                                     : completed
-                                    ? 'border-green-900 opacity-60'
-                                    : 'border-gray-700'
+                                    ? 'border-green-200 opacity-60'
+                                    : 'border-stone-200'
                             }`}
                         >
                             <input
@@ -142,29 +142,29 @@ export default function HabitsTab() {
                             <div className="flex-1">
                                 <div className="flex items-center gap-2 flex-wrap">
                                     <span className={`text-lg ${
-                                        completed || skipped ? 'line-through text-gray-500' : 'text-white'
+                                        completed || skipped ? 'line-through text-gray-400' : 'text-gray-800'
                                     }`}>
                                         {habit.label}
                                     </span>
                                     {streak > 0 && (
-                                        <span className="text-xs bg-orange-900 text-orange-300 px-2 py-0.5 rounded">
+                                        <span className="text-xs bg-orange-50 text-orange-600 px-2 py-0.5 rounded">
                                             🔥 {streak} {streak === 1 ? 'day' : 'days'}
                                         </span>
                                     )}
                                     {skipped && (
-                                        <span className="text-xs bg-yellow-800 text-yellow-300 px-2 py-0.5 rounded">
+                                        <span className="text-xs bg-yellow-50 text-yellow-700 px-2 py-0.5 rounded">
                                             {skipReason || 'Skip day'} — skipped
                                         </span>
                                     )}
                                 </div>
                                 {/* Shame badges */}
                                 {!completed && !skipped && missedDays === 1 && (
-                                    <span className="text-xs text-red-400 mt-1 block">
+                                    <span className="text-xs text-red-500 mt-1 block">
                                         Missed yesterday
                                     </span>
                                 )}
                                 {!completed && !skipped && missedDays >= 2 && (
-                                    <span className="text-xs text-red-400 mt-1 block">
+                                    <span className="text-xs text-red-500 mt-1 block">
                                         Missed {missedDays} days straight
                                     </span>
                                 )}
@@ -175,7 +175,7 @@ export default function HabitsTab() {
                                 </span>
                             )}
                             {isCriticalIncomplete && !isCriticalMissed && (
-                                <span className="text-xs bg-red-800 text-red-300 px-2 py-1 rounded font-bold">
+                                <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded font-bold">
                                     CRITICAL
                                 </span>
                             )}

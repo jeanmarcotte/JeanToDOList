@@ -101,25 +101,25 @@ export default function GoalsTab() {
             case 'cool':
                 return {
                     border: 'border-l-green-500',
-                    badge: 'bg-green-900 text-green-300',
+                    badge: 'bg-green-50 text-green-700',
                     dot: 'bg-green-500',
                 };
             case 'warm':
                 return {
                     border: 'border-l-yellow-500',
-                    badge: 'bg-yellow-900 text-yellow-300',
+                    badge: 'bg-yellow-50 text-yellow-700',
                     dot: 'bg-yellow-500',
                 };
             case 'hot':
                 return {
                     border: 'border-l-orange-500',
-                    badge: 'bg-orange-900 text-orange-300',
+                    badge: 'bg-orange-50 text-orange-700',
                     dot: 'bg-orange-500 animate-pulse',
                 };
             case 'overdue':
                 return {
                     border: 'border-l-red-500',
-                    badge: 'bg-red-900 text-red-300',
+                    badge: 'bg-red-50 text-red-700',
                     dot: 'bg-red-500 animate-pulse',
                 };
         }
@@ -131,7 +131,7 @@ export default function GoalsTab() {
     };
 
     if (loading) {
-        return <p className="text-center text-gray-500">Loading goals...</p>;
+        return <p className="text-center text-gray-400">Loading goals...</p>;
     }
 
     return (
@@ -139,7 +139,7 @@ export default function GoalsTab() {
             {/* Stats */}
             <div className="flex justify-center gap-6 mb-8 text-sm">
                 <div className="text-center">
-                    <div className="text-2xl font-bold text-teal-500">{goals.length}</div>
+                    <div className="text-2xl font-bold text-teal-600">{goals.length}</div>
                     <div className="text-gray-500">Active Goals</div>
                 </div>
             </div>
@@ -153,7 +153,7 @@ export default function GoalsTab() {
                         onChange={(e) => setTitleInput(e.target.value)}
                         onKeyDown={handleKeyDown}
                         placeholder="What's the goal?"
-                        className="flex-1 bg-gray-900 text-white text-lg px-6 py-4 rounded-lg border-2 border-gray-700 focus:border-teal-500 focus:outline-none"
+                        className="flex-1 bg-white text-gray-800 text-lg px-6 py-4 rounded-lg border border-stone-200 focus:border-teal-500 focus:outline-none shadow-sm"
                     />
                     <button
                         onClick={handleAdd}
@@ -161,7 +161,7 @@ export default function GoalsTab() {
                         className={`px-6 py-4 rounded-lg font-bold text-lg transition-colors ${
                             titleInput.trim() && dateInput
                                 ? 'bg-teal-600 hover:bg-teal-700 text-white'
-                                : 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                                : 'bg-stone-200 text-gray-400 cursor-not-allowed'
                         }`}
                     >
                         Add
@@ -172,19 +172,18 @@ export default function GoalsTab() {
                         type="date"
                         value={dateInput}
                         onChange={(e) => setDateInput(e.target.value)}
-                        className="bg-gray-900 text-white text-sm px-3 py-2 rounded-lg border border-gray-700 focus:border-teal-500 focus:outline-none"
-                        style={{ colorScheme: 'dark' }}
+                        className="bg-white text-gray-800 text-sm px-3 py-2 rounded-lg border border-stone-200 focus:border-teal-500 focus:outline-none"
                         placeholder="Target date"
                     />
                     {!dateInput && (
-                        <span className="text-gray-500 text-sm self-center">← Target date required</span>
+                        <span className="text-gray-400 text-sm self-center">← Target date required</span>
                     )}
                 </div>
             </div>
 
             {/* Goal List */}
             {goals.length === 0 ? (
-                <p className="text-gray-600 text-center py-8">No goals set. What are you working toward?</p>
+                <p className="text-gray-400 text-center py-8">No goals set. What are you working toward?</p>
             ) : (
                 <div className="space-y-3 mb-8">
                     {goals.map((goal) => {
@@ -195,17 +194,17 @@ export default function GoalsTab() {
                         return (
                             <div
                                 key={goal.id}
-                                className={`bg-gray-900 rounded-lg p-4 border-l-4 ${styles.border}`}
+                                className={`bg-white rounded-lg p-4 border-l-4 border border-stone-200 shadow-sm ${styles.border}`}
                             >
                                 <div className="flex items-start justify-between gap-3">
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-white font-medium mb-2">{goal.title}</p>
+                                        <p className="text-gray-800 font-medium mb-2">{goal.title}</p>
                                         <div className="flex flex-wrap items-center gap-2">
                                             <span className={`inline-flex items-center gap-1.5 text-xs px-2 py-1 rounded ${styles.badge}`}>
                                                 <span className={`w-2 h-2 rounded-full ${styles.dot}`}></span>
                                                 {getDaysLabel(days)}
                                             </span>
-                                            <span className="text-xs text-gray-500">
+                                            <span className="text-xs text-gray-400">
                                                 {formatTargetDate(goal.target_date)}
                                             </span>
                                         </div>
@@ -220,7 +219,7 @@ export default function GoalsTab() {
                                         </button>
                                         <button
                                             onClick={() => handleDelete(goal.id)}
-                                            className="px-3 py-2 bg-red-900 hover:bg-red-800 rounded text-white text-sm font-bold"
+                                            className="px-3 py-2 bg-red-100 hover:bg-red-200 rounded text-red-700 text-sm font-bold"
                                             title="Remove goal"
                                         >
                                             ✕

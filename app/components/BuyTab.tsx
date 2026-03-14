@@ -108,11 +108,11 @@ export default function BuyTab() {
     const getPriorityColor = (p: Priority) => {
         if (p === 'high') return 'border-l-red-500';
         if (p === 'medium') return 'border-l-yellow-500';
-        return 'border-l-gray-500';
+        return 'border-l-gray-400';
     };
 
     if (loading) {
-        return <p className="text-center text-gray-500">Loading purchases...</p>;
+        return <p className="text-center text-gray-400">Loading purchases...</p>;
     }
 
     return (
@@ -138,7 +138,7 @@ export default function BuyTab() {
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={handleKeyDown}
                         placeholder="What do you need to buy?"
-                        className="flex-1 bg-gray-900 text-white text-lg px-6 py-4 rounded-lg border-2 border-gray-700 focus:border-orange-500 focus:outline-none"
+                        className="flex-1 bg-white text-gray-800 text-lg px-6 py-4 rounded-lg border border-stone-200 focus:border-orange-500 focus:outline-none shadow-sm"
                     />
                     <button
                         onClick={handleAdd}
@@ -151,7 +151,7 @@ export default function BuyTab() {
                     <select
                         value={priority}
                         onChange={(e) => setPriority(e.target.value as Priority)}
-                        className="bg-gray-900 text-white text-sm px-3 py-2 rounded-lg border border-gray-700 focus:border-orange-500 focus:outline-none"
+                        className="bg-white text-gray-800 text-sm px-3 py-2 rounded-lg border border-stone-200 focus:border-orange-500 focus:outline-none"
                     >
                         <option value="high">High</option>
                         <option value="medium">Medium</option>
@@ -160,7 +160,7 @@ export default function BuyTab() {
                     <select
                         value={category}
                         onChange={(e) => setCategory(e.target.value as BuyCategory | '')}
-                        className="bg-gray-900 text-white text-sm px-3 py-2 rounded-lg border border-gray-700 focus:border-orange-500 focus:outline-none"
+                        className="bg-white text-gray-800 text-sm px-3 py-2 rounded-lg border border-stone-200 focus:border-orange-500 focus:outline-none"
                     >
                         <option value="">No category</option>
                         {BUY_CATEGORIES.map(c => (
@@ -171,40 +171,39 @@ export default function BuyTab() {
                         type="date"
                         value={dueDate}
                         onChange={(e) => setDueDate(e.target.value)}
-                        className="bg-gray-900 text-white text-sm px-3 py-2 rounded-lg border border-gray-700 focus:border-orange-500 focus:outline-none"
-                        style={{ colorScheme: 'dark' }}
+                        className="bg-white text-gray-800 text-sm px-3 py-2 rounded-lg border border-stone-200 focus:border-orange-500 focus:outline-none"
                     />
                 </div>
             </div>
 
             {/* Active Purchases */}
-            <h2 className="text-lg font-bold mb-4 text-gray-400">To Buy</h2>
+            <h2 className="text-lg font-bold mb-4 text-gray-500">To Buy</h2>
             {activePurchases.length === 0 ? (
-                <p className="text-gray-600 text-center py-8">Nothing to buy! 🎉</p>
+                <p className="text-gray-400 text-center py-8">Nothing to buy!</p>
             ) : (
                 <div className="space-y-3 mb-8">
                     {activePurchases.map(purchase => (
                         <div
                             key={purchase.id}
-                            className={`bg-gray-900 rounded-lg p-4 border-l-4 ${getPriorityColor(purchase.priority)}`}
+                            className={`bg-white rounded-lg p-4 border-l-4 border border-stone-200 shadow-sm ${getPriorityColor(purchase.priority)}`}
                         >
                             <div className="flex items-start justify-between gap-3">
                                 <div
                                     className="flex-1 cursor-pointer hover:opacity-80"
                                     onClick={() => setSelectedPurchase(purchase)}
                                 >
-                                    <p className="text-white font-medium line-clamp-2">{purchase.title}</p>
+                                    <p className="text-gray-800 font-medium line-clamp-2">{purchase.title}</p>
                                     <div className="flex flex-wrap gap-2 mt-2">
                                         {purchase.category && (
-                                            <span className="text-xs px-2 py-1 bg-gray-800 rounded text-gray-400">
+                                            <span className="text-xs px-2 py-1 bg-stone-100 rounded text-gray-500">
                         {purchase.category}
                       </span>
                                         )}
                                         {purchase.due_date && (
                                             <span className={`text-xs px-2 py-1 rounded ${
                                                 isOverdue(purchase.due_date)
-                                                    ? 'bg-red-900 text-red-300'
-                                                    : 'bg-gray-800 text-gray-400'
+                                                    ? 'bg-red-50 text-red-600'
+                                                    : 'bg-stone-100 text-gray-500'
                                             }`}>
                         {formatDueDate(purchase.due_date)}
                       </span>
@@ -220,7 +219,7 @@ export default function BuyTab() {
                                     </button>
                                     <button
                                         onClick={() => handleDelete(purchase.id)}
-                                        className="px-3 py-2 bg-red-600 hover:bg-red-700 rounded text-white text-sm font-bold"
+                                        className="px-3 py-2 bg-red-100 hover:bg-red-200 rounded text-red-700 text-sm font-bold"
                                     >
                                         Delete
                                     </button>
@@ -236,7 +235,7 @@ export default function BuyTab() {
                 <>
                     <button
                         onClick={() => setShowCompleted(!showCompleted)}
-                        className="text-gray-500 hover:text-gray-300 text-sm mb-4"
+                        className="text-gray-400 hover:text-gray-600 text-sm mb-4"
                     >
                         {showCompleted ? '▼' : '▶'} Purchased ({completedPurchases.length})
                     </button>
@@ -245,13 +244,13 @@ export default function BuyTab() {
                             {completedPurchases.map(purchase => (
                                 <div
                                     key={purchase.id}
-                                    className="bg-gray-900 rounded-lg p-4 border-l-4 border-l-green-500"
+                                    className="bg-white rounded-lg p-4 border-l-4 border-l-green-500 border border-stone-200 shadow-sm"
                                 >
                                     <div className="flex items-center justify-between gap-3">
-                                        <p className="text-white line-through">{purchase.title}</p>
+                                        <p className="text-gray-400 line-through">{purchase.title}</p>
                                         <button
                                             onClick={() => toggleComplete(purchase.id)}
-                                            className="px-3 py-2 bg-gray-700 hover:bg-gray-600 rounded text-white text-sm"
+                                            className="px-3 py-2 bg-stone-200 hover:bg-stone-300 rounded text-gray-700 text-sm"
                                         >
                                             Undo
                                         </button>
@@ -266,35 +265,35 @@ export default function BuyTab() {
             {/* Detail Modal */}
             {selectedPurchase && (
                 <div
-                    className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50"
+                    className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50"
                     onClick={() => setSelectedPurchase(null)}
                 >
                     <div
-                        className="bg-gray-900 rounded-lg p-6 max-w-lg w-full border border-gray-700 relative"
+                        className="bg-white rounded-lg p-6 max-w-lg w-full border border-stone-200 shadow-lg relative"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <button
                             onClick={() => setSelectedPurchase(null)}
-                            className="absolute top-4 right-4 text-gray-500 hover:text-white text-2xl"
+                            className="absolute top-4 right-4 text-gray-400 hover:text-gray-800 text-2xl"
                         >
                             ×
                         </button>
-                        <p className="text-white text-lg mb-4">{selectedPurchase.title}</p>
+                        <p className="text-gray-800 text-lg mb-4">{selectedPurchase.title}</p>
                         <div className="flex flex-wrap gap-2 mb-4">
                             {selectedPurchase.category && (
-                                <span className="text-xs px-2 py-1 bg-gray-800 rounded text-gray-400">
+                                <span className="text-xs px-2 py-1 bg-stone-100 rounded text-gray-500">
                   {selectedPurchase.category}
                 </span>
                             )}
                             {selectedPurchase.due_date && (
-                                <span className="text-xs px-2 py-1 bg-gray-800 rounded text-gray-400">
+                                <span className="text-xs px-2 py-1 bg-stone-100 rounded text-gray-500">
                   {formatDueDate(selectedPurchase.due_date)}
                 </span>
                             )}
                             <span className={`text-xs px-2 py-1 rounded ${
-                                selectedPurchase.priority === 'high' ? 'bg-red-900 text-red-300' :
-                                    selectedPurchase.priority === 'medium' ? 'bg-yellow-900 text-yellow-300' :
-                                        'bg-gray-800 text-gray-400'
+                                selectedPurchase.priority === 'high' ? 'bg-red-50 text-red-600' :
+                                    selectedPurchase.priority === 'medium' ? 'bg-yellow-50 text-yellow-700' :
+                                        'bg-stone-100 text-gray-500'
                             }`}>
                 {selectedPurchase.priority}
               </span>
@@ -314,7 +313,7 @@ export default function BuyTab() {
                                     handleDelete(selectedPurchase.id);
                                     setSelectedPurchase(null);
                                 }}
-                                className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 rounded text-white font-bold"
+                                className="flex-1 px-4 py-2 bg-red-100 hover:bg-red-200 rounded text-red-700 font-bold"
                             >
                                 Delete
                             </button>
