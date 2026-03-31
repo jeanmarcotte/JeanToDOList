@@ -239,7 +239,7 @@ export default function Home() {
         <div className="min-h-screen bg-[#1a1a1a] text-[#ededed] p-4">
             <div className="max-w-2xl mx-auto py-8">
                 <div className="flex items-center justify-center gap-3 mb-4">
-                    <h1 className="text-6xl font-bold text-center">JeanToDoList</h1>
+                    <h1 className="text-5xl font-bold text-center">JeanToDoList</h1>
                     <button
                         onClick={handlePrint}
                         className="text-gray-500 hover:text-white transition-colors"
