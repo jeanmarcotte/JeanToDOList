@@ -63,7 +63,7 @@ function isDayApplicable(habit: Habit, dayOfWeek: number): boolean {
 export async function getActiveHabits(): Promise<Habit[]> {
   const supabase = getSupabaseAdmin();
   const { data, error } = await supabase
-    .from("habits")
+    .from("todo_habits")
     .select("*")
     .eq("active", true)
     .order("sort_order", { ascending: true });
@@ -186,7 +186,7 @@ export async function getTodayHabits(): Promise<{
 
     // Check skip day
     const { data: skipDayRow, error: skipError } = await supabase
-      .from("skip_days")
+      .from("todo_skip_days")
       .select("reason")
       .eq("date", today)
       .maybeSingle();
@@ -198,7 +198,7 @@ export async function getTodayHabits(): Promise<{
 
     // Fetch today's logs
     const { data: todayLogs, error: logError } = await supabase
-      .from("habit_logs")
+      .from("todo_habit_logs")
       .select("habit_key")
       .eq("completed_date", today);
 
@@ -213,11 +213,11 @@ export async function getTodayHabits(): Promise<{
 
     const [logsResult, skipDaysResult] = await Promise.all([
       supabase
-        .from("habit_logs")
+        .from("todo_habit_logs")
         .select("habit_key, completed_date")
         .gte("completed_date", pastDateStr),
       supabase
-        .from("skip_days")
+        .from("todo_skip_days")
         .select("date, reason")
         .gte("date", pastDateStr),
     ]);
@@ -266,7 +266,7 @@ export async function toggleHabit(
   const today = getTodayDateString();
 
   const { data: existing, error: fetchError } = await supabase
-    .from("habit_logs")
+    .from("todo_habit_logs")
     .select("id")
     .eq("habit_key", habitKey)
     .eq("completed_date", today)
@@ -278,7 +278,7 @@ export async function toggleHabit(
 
   if (existing) {
     const { error: deleteError } = await supabase
-      .from("habit_logs")
+      .from("todo_habit_logs")
       .delete()
       .eq("id", existing.id);
 
@@ -288,7 +288,7 @@ export async function toggleHabit(
     return { completed: false, milestone: null, error: null };
   } else {
     const { error: insertError } = await supabase
-      .from("habit_logs")
+      .from("todo_habit_logs")
       .insert({ habit_key: habitKey, completed_date: today });
 
     if (insertError) {
@@ -302,16 +302,16 @@ export async function toggleHabit(
 
     const [logsResult, skipDaysResult, habitResult] = await Promise.all([
       supabase
-        .from("habit_logs")
+        .from("todo_habit_logs")
         .select("habit_key, completed_date")
         .eq("habit_key", habitKey)
         .gte("completed_date", pastDateStr),
       supabase
-        .from("skip_days")
+        .from("todo_skip_days")
         .select("date, reason")
         .gte("date", pastDateStr),
       supabase
-        .from("habits")
+        .from("todo_habits")
         .select("*")
         .eq("habit_key", habitKey)
         .single(),
@@ -347,7 +347,7 @@ export async function getHabits(): Promise<{
 }> {
   const supabase = getSupabaseAdmin();
   const { data, error } = await supabase
-    .from("habits")
+    .from("todo_habits")
     .select("*")
     .order("sort_order", { ascending: true });
 
@@ -372,7 +372,7 @@ export async function createHabit(params: {
 
   // Get max sort_order
   const { data: maxRow } = await supabase
-    .from("habits")
+    .from("todo_habits")
     .select("sort_order")
     .order("sort_order", { ascending: false })
     .limit(1)
@@ -381,7 +381,7 @@ export async function createHabit(params: {
   const sort_order = (maxRow?.sort_order ?? -1) + 1;
 
   const { data, error } = await supabase
-    .from("habits")
+    .from("todo_habits")
     .insert({
       habit_key,
       label: params.label,
@@ -411,7 +411,7 @@ export async function updateHabit(
   }>
 ): Promise<{ error: string | null }> {
   const supabase = getSupabaseAdmin();
-  const { error } = await supabase.from("habits").update(params).eq("id", id);
+  const { error } = await supabase.from("todo_habits").update(params).eq("id", id);
   if (error) return { error: error.message };
   return { error: null };
 }
@@ -420,7 +420,7 @@ export async function updateHabit(
 export async function deleteHabit(id: number): Promise<{ error: string | null }> {
   const supabase = getSupabaseAdmin();
   const { error } = await supabase
-    .from("habits")
+    .from("todo_habits")
     .update({ active: false })
     .eq("id", id);
   if (error) return { error: error.message };

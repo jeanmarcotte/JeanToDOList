@@ -41,7 +41,7 @@ export async function getActiveStakes(): Promise<{
   const supabase = getSupabaseAdmin();
 
   const { data: stakes, error: stakesError } = await supabase
-    .from("stakes")
+    .from("todo_stakes")
     .select("*")
     .eq("active", true)
     .order("created_at", { ascending: false });
@@ -57,7 +57,7 @@ export async function getActiveStakes(): Promise<{
   // Get entry amounts for each stake
   const stakeIds = stakes.map((s) => s.id);
   const { data: entries, error: entriesError } = await supabase
-    .from("stake_entries")
+    .from("todo_stake_entries")
     .select("stake_id, amount")
     .in("stake_id", stakeIds);
 
@@ -91,7 +91,7 @@ export async function createStake(
   const supabase = getSupabaseAdmin();
 
   const { data, error } = await supabase
-    .from("stakes")
+    .from("todo_stakes")
     .insert([{ title, target_count: targetCount, deadline, reward, consequence }])
     .select()
     .single();
@@ -111,7 +111,7 @@ export async function addStakeEntry(
   const supabase = getSupabaseAdmin();
 
   const { data, error } = await supabase
-    .from("stake_entries")
+    .from("todo_stake_entries")
     .insert([{ stake_id: stakeId, note, amount }])
     .select()
     .single();
@@ -130,7 +130,7 @@ export async function getInactiveStakes(): Promise<{
   const supabase = getSupabaseAdmin();
 
   const { data: stakes, error: stakesError } = await supabase
-    .from("stakes")
+    .from("todo_stakes")
     .select("*")
     .eq("active", false)
     .order("created_at", { ascending: false });
@@ -145,7 +145,7 @@ export async function getInactiveStakes(): Promise<{
 
   const stakeIds = stakes.map((s) => s.id);
   const { data: entries, error: entriesError } = await supabase
-    .from("stake_entries")
+    .from("todo_stake_entries")
     .select("stake_id, amount")
     .in("stake_id", stakeIds);
 
@@ -175,7 +175,7 @@ export async function deactivateStake(
   const supabase = getSupabaseAdmin();
 
   const { error } = await supabase
-    .from("stakes")
+    .from("todo_stakes")
     .update({ active: false })
     .eq("id", stakeId);
 
@@ -192,7 +192,7 @@ export async function abandonStake(
   const supabase = getSupabaseAdmin();
 
   const { error } = await supabase
-    .from("stakes")
+    .from("todo_stakes")
     .update({ active: false, abandoned: true })
     .eq("id", stakeId);
 
@@ -209,7 +209,7 @@ export async function getStakeEntries(
   const supabase = getSupabaseAdmin();
 
   const { data, error } = await supabase
-    .from("stake_entries")
+    .from("todo_stake_entries")
     .select("*")
     .eq("stake_id", stakeId)
     .order("created_at", { ascending: false });

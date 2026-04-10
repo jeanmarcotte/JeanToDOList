@@ -31,21 +31,21 @@ export async function GET(request: NextRequest) {
 
   // Fetch incomplete tasks
   const { data: tasks } = await supabase
-    .from("tasks")
+    .from("todo_tasks")
     .select("*")
     .eq("completed", false)
     .order("created_at", { ascending: false });
 
   // Check skip day
   const { data: skipDay } = await supabase
-    .from("skip_days")
+    .from("todo_skip_days")
     .select("reason")
     .eq("date", today)
     .maybeSingle();
 
   // Fetch habits from DB
   const { data: allHabits } = await supabase
-    .from("habits")
+    .from("todo_habits")
     .select("*")
     .eq("active", true)
     .order("sort_order", { ascending: true });
@@ -63,7 +63,7 @@ export async function GET(request: NextRequest) {
 
   // Active stakes
   const { data: stakes } = await supabase
-    .from("stakes")
+    .from("todo_stakes")
     .select("*")
     .eq("active", true)
     .order("created_at", { ascending: false });
@@ -72,7 +72,7 @@ export async function GET(request: NextRequest) {
   if (stakes && stakes.length > 0) {
     const stakeIds = stakes.map((s) => s.id);
     const { data: entries } = await supabase
-      .from("stake_entries")
+      .from("todo_stake_entries")
       .select("stake_id, amount")
       .in("stake_id", stakeIds);
 

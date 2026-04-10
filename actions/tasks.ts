@@ -26,7 +26,7 @@ export async function getTasks(): Promise<{ data: Task[] | null; error: string |
   const supabase = getSupabaseAdmin();
 
   const { data, error } = await supabase
-    .from("tasks")
+    .from("todo_tasks")
     .select("*")
     .order("created_at", { ascending: false });
 
@@ -46,7 +46,7 @@ export async function createTask(
   const supabase = getSupabaseAdmin();
 
   const { data, error } = await supabase
-    .from("tasks")
+    .from("todo_tasks")
     .insert([{ title, completed: false, priority, category, due_date }])
     .select()
     .single();
@@ -70,7 +70,7 @@ export async function updateTask(
   const supabase = getSupabaseAdmin();
 
   const { data, error } = await supabase
-    .from("tasks")
+    .from("todo_tasks")
     .update(updates)
     .eq("id", id)
     .select()
@@ -90,7 +90,7 @@ export async function updateTaskCompletion(
   const supabase = getSupabaseAdmin();
 
   const { error } = await supabase
-    .from("tasks")
+    .from("todo_tasks")
     .update({ completed })
     .eq("id", id);
 
@@ -104,7 +104,7 @@ export async function updateTaskCompletion(
 export async function deleteTask(id: number): Promise<{ error: string | null }> {
   const supabase = getSupabaseAdmin();
 
-  const { error } = await supabase.from("tasks").delete().eq("id", id);
+  const { error } = await supabase.from("todo_tasks").delete().eq("id", id);
 
   if (error) {
     return { error: error.message };
@@ -118,7 +118,7 @@ export async function getCompletedCount(): Promise<{ count: number; error: strin
   const supabase = getSupabaseAdmin();
 
   const { count, error } = await supabase
-      .from("tasks")
+      .from("todo_tasks")
       .select("*", { count: "exact", head: true })
       .eq("completed", true);
 

@@ -22,7 +22,7 @@ export interface Purchase {
 
 export async function getPurchases() {
     const { data, error } = await supabase
-        .from("purchases")
+        .from("todo_purchases")
         .select("*")
         .order("created_at", { ascending: false });
 
@@ -36,7 +36,7 @@ export async function createPurchase(
     due_date: string | null
 ) {
     const { data, error } = await supabase
-        .from("purchases")
+        .from("todo_purchases")
         .insert([{ title, priority, category, due_date }])
         .select()
         .single();
@@ -46,7 +46,7 @@ export async function createPurchase(
 
 export async function updatePurchaseCompletion(id: number, completed: boolean) {
     const { error } = await supabase
-        .from("purchases")
+        .from("todo_purchases")
         .update({ completed })
         .eq("id", id);
 
@@ -55,7 +55,7 @@ export async function updatePurchaseCompletion(id: number, completed: boolean) {
 
 export async function deletePurchase(id: number) {
     const { error } = await supabase
-        .from("purchases")
+        .from("todo_purchases")
         .delete()
         .eq("id", id);
 

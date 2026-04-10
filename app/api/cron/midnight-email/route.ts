@@ -40,14 +40,14 @@ export async function GET(request: NextRequest) {
 
   // Check skip day
   const { data: skipDay } = await supabase
-    .from("skip_days")
+    .from("todo_skip_days")
     .select("reason")
     .eq("date", today)
     .maybeSingle();
 
   // Get today's habit completions
   const { data: habitLogs } = await supabase
-    .from("habit_logs")
+    .from("todo_habit_logs")
     .select("habit_key")
     .eq("completed_date", today);
 
@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
 
   // Fetch habits from DB
   const { data: allHabits } = await supabase
-    .from("habits")
+    .from("todo_habits")
     .select("*")
     .eq("active", true)
     .order("sort_order", { ascending: true });
@@ -75,7 +75,7 @@ export async function GET(request: NextRequest) {
 
   // Get tasks
   const { data: allTasks } = await supabase
-    .from("tasks")
+    .from("todo_tasks")
     .select("*")
     .order("created_at", { ascending: false });
 

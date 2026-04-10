@@ -21,7 +21,7 @@ export interface Goal {
 export async function getGoals() {
     const supabase = getSupabaseAdmin();
     const { data, error } = await supabase
-        .from("goals")
+        .from("todo_goals")
         .select("*")
         .eq("status", "active")
         .order("target_date", { ascending: true });
@@ -31,7 +31,7 @@ export async function getGoals() {
 export async function addGoal(title: string, targetDate: string) {
     const supabase = getSupabaseAdmin();
     const { data, error } = await supabase
-        .from("goals")
+        .from("todo_goals")
         .insert([{ title, target_date: targetDate, status: 'active' }])
         .select()
         .single();
@@ -41,7 +41,7 @@ export async function addGoal(title: string, targetDate: string) {
 export async function completeGoal(id: number) {
     const supabase = getSupabaseAdmin();
     const { error } = await supabase
-        .from("goals")
+        .from("todo_goals")
         .update({ status: 'completed', completed_at: new Date().toISOString() })
         .eq("id", id);
     return { error: error?.message };
@@ -50,7 +50,7 @@ export async function completeGoal(id: number) {
 export async function deleteGoal(id: number) {
     const supabase = getSupabaseAdmin();
     const { error } = await supabase
-        .from("goals")
+        .from("todo_goals")
         .delete()
         .eq("id", id);
     return { error: error?.message };
@@ -59,7 +59,7 @@ export async function deleteGoal(id: number) {
 export async function getActiveGoalCount() {
     const supabase = getSupabaseAdmin();
     const { count, error } = await supabase
-        .from("goals")
+        .from("todo_goals")
         .select("*", { count: 'exact', head: true })
         .eq("status", "active");
     return { count: count ?? 0, error: error?.message };

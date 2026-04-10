@@ -23,12 +23,12 @@ export async function getAllPrintData(): Promise<{ data: PrintData | null; error
 
     try {
         const [prioritiesRes, goalsRes, habitsRes, stakesRes, purchasesRes, tasksRes] = await Promise.all([
-            supabase.from("priorities").select("id, title, sort_order").eq("status", "active").order("sort_order", { ascending: true }),
-            supabase.from("goals").select("id, title, target_date").eq("status", "active").order("target_date", { ascending: true }),
-            supabase.from("habits").select("id, label, critical").eq("active", true).order("sort_order", { ascending: true }),
-            supabase.from("stakes").select("*").eq("active", true).order("created_at", { ascending: false }),
-            supabase.from("purchases").select("id, title, priority, category, due_date").eq("completed", false).order("created_at", { ascending: false }),
-            supabase.from("tasks").select("id, title, priority, category, due_date").eq("completed", false).order("created_at", { ascending: false }),
+            supabase.from("todo_priorities").select("id, title, sort_order").eq("status", "active").order("sort_order", { ascending: true }),
+            supabase.from("todo_goals").select("id, title, target_date").eq("status", "active").order("target_date", { ascending: true }),
+            supabase.from("todo_habits").select("id, label, critical").eq("active", true).order("sort_order", { ascending: true }),
+            supabase.from("todo_stakes").select("*").eq("active", true).order("created_at", { ascending: false }),
+            supabase.from("todo_purchases").select("id, title, priority, category, due_date").eq("completed", false).order("created_at", { ascending: false }),
+            supabase.from("todo_tasks").select("id, title, priority, category, due_date").eq("completed", false).order("created_at", { ascending: false }),
         ]);
 
         // Calculate stake progress
@@ -36,7 +36,7 @@ export async function getAllPrintData(): Promise<{ data: PrintData | null; error
         if (stakesRes.data && stakesRes.data.length > 0) {
             const stakeIds = stakesRes.data.map(s => s.id);
             const { data: entries } = await supabase
-                .from("stake_entries")
+                .from("todo_stake_entries")
                 .select("stake_id, amount")
                 .in("stake_id", stakeIds);
 

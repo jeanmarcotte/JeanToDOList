@@ -23,7 +23,7 @@ export async function getSkipDays(): Promise<{
 }> {
   const supabase = getSupabaseAdmin();
   const { data, error } = await supabase
-    .from("skip_days")
+    .from("todo_skip_days")
     .select("*")
     .order("date", { ascending: true });
 
@@ -40,7 +40,7 @@ export async function getTodaySkipDay(): Promise<{
   const supabase = getSupabaseAdmin();
   const today = new Date().toLocaleDateString("en-CA", { timeZone: "America/Toronto" });
   const { data, error } = await supabase
-    .from("skip_days")
+    .from("todo_skip_days")
     .select("reason")
     .eq("date", today)
     .maybeSingle();
@@ -59,7 +59,7 @@ export async function addSkipDay(
   const supabase = getSupabaseAdmin();
 
   const { error } = await supabase
-    .from("skip_days")
+    .from("todo_skip_days")
     .upsert({ date, reason, auto_recovery: autoRecovery }, { onConflict: "date" });
 
   if (error) {
@@ -73,7 +73,7 @@ export async function addSkipDay(
     const nextDateStr = nextDay.toLocaleDateString("en-CA", { timeZone: "America/Toronto" });
 
     const { error: recoveryError } = await supabase
-      .from("skip_days")
+      .from("todo_skip_days")
       .upsert({ date: nextDateStr, reason: "Recovery", auto_recovery: false }, { onConflict: "date" });
 
     if (recoveryError) {
@@ -88,7 +88,7 @@ export async function deleteSkipDay(
   id: number
 ): Promise<{ error: string | null }> {
   const supabase = getSupabaseAdmin();
-  const { error } = await supabase.from("skip_days").delete().eq("id", id);
+  const { error } = await supabase.from("todo_skip_days").delete().eq("id", id);
 
   if (error) {
     return { error: error.message };
